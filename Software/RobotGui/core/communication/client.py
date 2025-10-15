@@ -2,7 +2,6 @@ from paho.mqtt.client import Client as MC
 from paho.mqtt.enums import CallbackAPIVersion
 
 from RobotGui.core.communication.subscribe.coordinates import Coordinates
-from RobotGui.core.communication.publish.movement import Movement_Publish
 
 class Mqtt():
     def __init__(self, coordinates_slot, address = 'localhost', port = 1883):
