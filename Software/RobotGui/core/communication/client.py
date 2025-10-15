@@ -2,15 +2,17 @@ from paho.mqtt.client import Client as MC
 from paho.mqtt.enums import CallbackAPIVersion
 
 from RobotGui.core.communication.subscribe.coordinates import Coordinates
+from RobotGui.core.communication.subscribe.arm_position import Arm_Position
 
 import time
 from threading import Thread
 
 class Mqtt():
-    def __init__(self, coordinates_slot, address = 'localhost', port = 1883):
+    def __init__(self, coordinates_slot, arm_slot, address = 'localhost', port = 1883):
         self.publishing_setup() #for all publishing to all topics
 
-        coordinates_setup = Coordinates(coordinates_slot, address, port)
+        self.coordinates = Coordinates(coordinates_slot, address, port)
+        self.arm_position = Arm_Position(arm_slot, address, port)
         
     def publishing_setup(self):
         self.unacked_publish = set()
