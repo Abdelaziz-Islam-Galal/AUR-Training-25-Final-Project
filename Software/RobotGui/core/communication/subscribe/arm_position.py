@@ -2,7 +2,7 @@ from paho.mqtt.client import Client as MC
 from paho.mqtt.enums import CallbackAPIVersion
 import paho.mqtt.subscribe as subscribe
 
-class Coordinates():
+class Arm_Position():
     def __init__(self, coordinates_slot, address, port):
         self.sub_arm = MC(CallbackAPIVersion.VERSION2)
         self.slot = coordinates_slot
