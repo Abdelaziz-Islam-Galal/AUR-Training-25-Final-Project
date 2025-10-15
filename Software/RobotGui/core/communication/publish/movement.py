@@ -1,11 +1,11 @@
-import time
+from RobotGui.core.communication.client import Mqtt
 
 class Movement_Publish():
     def __init__(self, mqtt_client):
         print("entered MovementPublish init")
         self.mqtt = mqtt_client # the mqtt instance -> the one that setted publishing
         self.x, self.y = 0, 0
-        self.theita = 0
+        self.theta = 0
 
     # def handle_key_event(self, key_event):
     #     key = key_event.key()
@@ -24,21 +24,11 @@ class Movement_Publish():
     #     self.publish_movement()
 
     def publish_body_movement(self):
-        msg = self.mqtt._mqttc_pub.publish("robot/body/movement", f'{self.x},{self.y}')
-        if self.mqtt.unacked_publish is not None:
-            self.mqtt.unacked_publish.add(msg.mid)
-        while len( self.mqtt.unacked_publish):
-            time.sleep(0.1)
-        msg.wait_for_publish()
+        Mqtt.publish_msg(self.mqtt, "robot/body/movement", self.x, self.y)
         print(f"Published body movement: {self.x}, {self.y}")
 
     def publish_arm_movement(self):
-        msg = self.mqtt.pub.publish("robot/arm/movement", f'{self.theita}')
-        if self.mqtt.unacked_publish is not None:
-            self.mqtt.unacked_publish.add(msg.mid)
-        while len(self.mqtt.unacked_publish):
-            time.sleep(0.1)
-        msg.wait_for_publish()
-        print(f"Published arm movement: {self.theita}")
+        Mqtt.publish_msg(self.mqtt, "robot/arm/movement", self.theta)
+        print(f"Published arm movement: {self.theta}")
     
 
