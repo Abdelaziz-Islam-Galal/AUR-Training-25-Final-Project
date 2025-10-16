@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from PIL import Image
 
 
 #------>All possible BGR colors (to mask them) until being surprised by a new color on the competetion day
@@ -48,25 +49,53 @@ def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
     mask = cv2.inRange(image,lowerlimit,upperlimit)
     return mask
 
-#----->usable function to detect colors
-def DetectColor(image:cv2.Mat , ColorToDetect:str) -> bool : 
-    detected = False
-    out = image.copy()
-    mask = FormMask(out,ColorToDetect)
-    detected = np.sum(mask) > 500  # 500 is the threshold that may be changed upon trials in real areas
-    return detected #type:ignore
+
+#----->color detection class requests the image and the color 
+#----->it has a property to get the x and y coordinates at which the color is saturated - for tracking
+class ColorDetection():
+    def __init__(self ,image , color):
+        self._Frame = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+        self.detected = False
+        self.SaturatedX = 0
+        self.SaturatedY = 0
+        self.mask = FormMask(self._Frame , color)#type:ignore
+    
+    #----->usable function to detect colors(class:ColorDetection)
+    def DetectColor(self) -> bool : 
+        DetectionMask = self.mask.copy()
+        self.detected = np.sum(DetectionMask) > (700 * 255)  # 500 is the threshold that may be changed upon trials in real areas
+        return self.detected #type:ignore
+    
+    @property
+    def saturation(self):
+        x1 = 0;x2=0;y1=0;y2=0
+        SaturationMask = self.mask.copy() #copying the instance mask
+
+        PilFormatedMask = Image.fromarray(SaturationMask) #formating to PIL
+        ColorBox = PilFormatedMask.getbbox() #getting the coords of the frame
+
+        if ColorBox is not None:
+            x1, y1, x2, y2 = ColorBox
+            
+        
+        else :
+            x1 = 0;x2=0;y1=0;y2=0
+          
+        #calculations to get the center
+        self.SaturatedX = (x1+x2)/2 #type:ignore
+        self.SaturatedY = (y1+y2)/2 #type:ignore
+
+        return self.SaturatedX , self.SaturatedY
+
 
 
 #----->usable function for color recognition
-def RecogniteColors():
+def RecognizeColors():
     ...#still working on code .......
     pass
 
 
     
-
-
-
 #----->testing rubbish
 
 #cap = cv2.VideoCapture(0)
@@ -74,29 +103,16 @@ def RecogniteColors():
 #while True:
 #    ret , frame = cap.read()
 #
-#    HSV_image = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-#    
-#    mask = FormMask(HSV_image,'green')
-
-#    from PIL import Image
-#    mask_ = Image.fromarray(mask)
+#    image = ColorDetection(frame , "green")
+#    detected = image.DetectColor()
+#    x , y = image.saturation
+#    if detected:
+#        print(f'{x},{y} ,color detected')
 #
-#    bbox = mask_.getbbox()
-#
-#    if bbox is not None:
-#        x1, y1, x2, y2 = bbox
-#
-#        frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
-#
-#    cv2.imshow('frame', mask)
+#    cv2.imshow('frame', frame)
 #    if cv2.waitKey(1) == ord('z'):
 #        break
 #
 #cap.release()
 #
 #cv2.destroyAllWindows()
-
-
-
-
-
