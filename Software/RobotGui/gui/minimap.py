@@ -5,6 +5,8 @@ from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QFont
 import cv2
 
+from RobotGui.core.communication.client import Mqtt
+from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 
 class Minimap(QWidget):
     def __init__(self, parent: QWidget | None = None):
@@ -27,9 +29,11 @@ class Minimap(QWidget):
 
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
-        self._x = 0
-        self._y = 0
-        self._coords_label.setText(f'x:{self._x}, y:{self._y}')
+        
+        # self._x = 0
+        # self._y = 0
+        
+        Mqtt(SubscribersMethods.update_coordinates)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)

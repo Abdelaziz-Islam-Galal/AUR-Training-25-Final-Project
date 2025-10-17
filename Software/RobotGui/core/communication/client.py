@@ -8,11 +8,11 @@ import time
 from threading import Thread
 
 class Mqtt():
-    def __init__(self, coordinates_slot, arm_slot, address = 'localhost', port = 1883):
+    def __init__(self, coordinates_slot, address = 'localhost', port = 1883):
         self.publishing_setup() #for all publishing to all topics
 
         self.coordinates = Coordinates(coordinates_slot, address, port)
-        self.arm_position = Arm_Position(arm_slot, address, port)
+        #self.arm_position = Arm_Position(arm_slot, address, port) -> add arm_slot as input if this is uncommented
         
     def publishing_setup(self):
         self.unacked_publish = set()
