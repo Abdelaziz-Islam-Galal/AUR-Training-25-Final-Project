@@ -1,10 +1,9 @@
 from PySide6.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy
 from PySide6.QtGui import QResizeEvent
-
+from PySide6.QtCore import QTimer
 from RobotGui.gui.camera_display import CameraDisplay
 from RobotGui.gui.minimap import Minimap
 from RobotGui.gui.settings import Settings
-
 
 class Window(QMainWindow):
     def __init__(self):
@@ -15,6 +14,11 @@ class Window(QMainWindow):
         self.setCentralWidget(CentralWidget())
         self.centralWidget().setMinimumSize(550, 300)
         self._aspect_ratio = 11/6
+        self._coords_timer=QTimer()
+        self._camera_timer = QTimer()
+        self._camera_timer.timeout.connect(Minimap.update_coordinates)
+        self._camera_timer.setInterval(17)  #around 60 FPS
+        self._camera_timer.start()
 
         self.show()
 
@@ -22,7 +26,7 @@ class Window(QMainWindow):
         super().resizeEvent(event)
 
         window_size = self.size()
-
+        
         window_width = window_size.width()
         window_height = window_size.height()
 
