@@ -13,7 +13,9 @@ class Mqtt():
 
         self.coordinates = Coordinates(coordinates_slot, address, port)
         #self.arm_position = Arm_Position(arm_slot, address, port) -> add arm_slot as input if this is uncommented
-        
+
+
+    # publishing methods: 
     def publishing_setup(self):
         self.unacked_publish = set()
         self.pub = MC(CallbackAPIVersion.VERSION2)

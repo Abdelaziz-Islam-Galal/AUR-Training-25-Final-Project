@@ -33,7 +33,8 @@ class Minimap(QWidget):
         # self._x = 0
         # self._y = 0
         
-        Mqtt(SubscribersMethods.update_coordinates)
+        self._subscribers = SubscribersMethods(self._coords_label)
+        self._mqtt = Mqtt(self._subscribers.update_coordinates)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
