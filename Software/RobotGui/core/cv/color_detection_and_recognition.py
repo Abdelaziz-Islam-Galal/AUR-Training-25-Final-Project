@@ -63,7 +63,10 @@ class ColorDetection():
     #----->usable function to detect colors(class:ColorDetection)
     def DetectColor(self) -> bool : 
         DetectionMask = self.mask.copy()
-        self.detected = np.sum(DetectionMask) > (700 * 255)  # 500 is the threshold that may be changed upon trials in real areas
+
+        #using ratio to get the threshold
+        self.detected = (np.sum(DetectionMask) / (DetectionMask.size * 255)) > 0.01  
+
         return self.detected #type:ignore
     
     @property
@@ -76,8 +79,6 @@ class ColorDetection():
 
         if ColorBox is not None:
             x1, y1, x2, y2 = ColorBox
-            
-        
         else :
             x1 = 0;x2=0;y1=0;y2=0
           
@@ -86,12 +87,28 @@ class ColorDetection():
         self.SaturatedY = (y1+y2)/2 #type:ignore
 
         return self.SaturatedX , self.SaturatedY
+    
+    @property
+    def sat_dist_to_center(self):
+        #calculating the center of the frame
+        length , width = self._Frame.shape
+        Cx = width/2
+        Cy = length/2
+
+        #calling the center of the color
+        x , y = self.saturation
+
+        #calculating the difference
+        diffX = Cx-x
+        diffY = Cy-y
+
+        return diffX , diffY
 
 
 
 #----->usable function for color recognition
-def RecognizeColors():
-    ...#still working on code .......
+def RecognizeColors(frame ):
+    
     pass
 
 
