@@ -1,8 +1,8 @@
 ##
 ## This is a placeholder file
 ##
-from PySide6.QtWidgets import QWidget, QLabel
-from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QFont
+from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
+from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QFont,QColor,Qt,QTransform
 import cv2
 
 
@@ -14,17 +14,26 @@ class Minimap(QWidget):
         font.setPointSize(16)
 
         self._aspect_ratio = 1
+        self._square_size=None
 
-        self._frame_view = QLabel(self)
-        self._frame_view.setScaledContents(True)
+        self._scene=QGraphicsScene(self)
+        self._view=QGraphicsView(self._scene,self)
+        self._view.setRenderHint(self._view.renderHints() | self._view.renderHints().Antialiasing)
+        self._view.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self._frame = cv2.imread('minimap_placeholder.png')
+        #setting background item
+        self._background=QGraphicsRectItem()
+        self._background.setBrush(QColor(200,200,200))
+        self._scene.addItem(self._background)
+        #setting robot item
+        self._robot=QGraphicsEllipseItem()
+        self._robot.setBrush(QColor(255,0,0))
+        self._scene.addItem(self._robot)
+
         
-        frame = self._frame
-        if frame is not None:
-            image = QImage(frame.data, frame.shape[1], frame.shape[0], frame.strides[0], QImage.Format.Format_BGR888)
-            self._frame_view.setPixmap(QPixmap.fromImage(image))
-
+        self._robot_coords=None
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
         self._x = 0
@@ -33,21 +42,52 @@ class Minimap(QWidget):
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
+        
 
         window_size = self.size()
 
         window_width = window_size.width()
         window_height = window_size.height()
 
-        if window_width > window_height*self._aspect_ratio:
-            new_width = int(window_height*self._aspect_ratio)
-            new_height = window_height
-        else:
-            new_width = window_width
-            new_height = int(window_width/self._aspect_ratio)
+        self._square_size = min(window_width, window_height)
 
-        x_offset = (window_width - new_width)//2
-        y_offset = 0
 
-        self._frame_view.setGeometry(x_offset, y_offset, new_width, new_height)
+        x_offset = (window_width - self._square_size) // 2
+        y_offset = (window_height - self._square_size) // 2
+
+        self._scene.setSceneRect(0, 0, self._square_size, self._square_size)
+        transform = QTransform()
+        transform.translate(0, self._square_size)
+        transform.scale(1, -1)
+        self._view.setTransform(transform)
+
+        # update background and robot
+        self._background.setRect(0, 0, self._square_size, self._square_size)
+
+        
+
+
+        self._view.setGeometry(x_offset, y_offset, self._square_size, self._square_size)
         self._coords_label.move(x_offset + 5, y_offset)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.update_minimap()
+
+    def update_minimap(self):
+        #self._view.setGeometry(0, 0, self.width(), self.height())
+        self._scene.setSceneRect(0,0,self._square_size,self._square_size)
+        transform=QTransform()
+        transform.translate(0,self._square_size)
+        transform.scale(1,-1)
+        self._view.setTransform(transform)
+        self._background.setRect(0, 0, self._square_size, self._square_size)
+        self._robot_coords=(0,0)
+        self._robot.setRect(self._robot_coords[0],self._robot_coords[1],10,10)
+
+    
+    def update_coordinates():
+        #client subscribe function to be called let's say it's called new_coords
+        '''self._robot_coords=new_coords()
+        self._robot.setPos(self._robot_coords)'''
+            
