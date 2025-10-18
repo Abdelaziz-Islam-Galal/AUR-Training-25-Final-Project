@@ -23,9 +23,9 @@ while True:
             x = eventValues[0]
             y = eventValues[1]
 
-            magnitude = ((x*x)+(y*y)) // 2
+            magnitude = math.sqrt((x*x)+(y*y)) 
             if x != 0:
-                angle = math.atan(y / x) #from -pi/2 ------> pi/2
+                angle = math.atan2(y , x) #from -pi/2 ------> pi/2
 
             vector=[magnitude, angle] 
             robotcontroller.choose_mode(vector)
@@ -35,15 +35,15 @@ while True:
                 xpressed = [True]
                 robotcontroller.choose_mode(xpressed)
 
-            if event.button == 1:
+            elif event.button == 1:
                 cpressed = [True]
                 robotcontroller.choose_mode(cpressed)
 
-            if event.button == 2:
+            elif event.button == 2:
                 spressed = [True]
                 robotcontroller.choose_mode(spressed)
 
-            if event.button == 3:
+            elif event.button == 3:
                 tpressed = [True]
                 robotcontroller.choose_mode(tpressed)
             
@@ -52,14 +52,16 @@ while True:
                 xpressed = [False]
                 robotcontroller.choose_mode(xpressed)
 
-            if event.button == 1:
+            elif event.button == 1:
                 cpressed = [False]
                 robotcontroller.choose_mode(cpressed)
 
-            if event.button == 2:
+            elif event.button == 2:
                 spressed = [False]
                 robotcontroller.choose_mode(spressed)
 
-            if event.button == 3:
+            elif event.button == 3:
                 tpressed = [False]
                 robotcontroller.choose_mode(tpressed)
+    
+    pygame.time.delay(10)
