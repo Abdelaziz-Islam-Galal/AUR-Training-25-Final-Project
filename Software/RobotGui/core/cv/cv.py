@@ -3,8 +3,8 @@ from threading import Thread
 from time import sleep
 from RobotGui.core.cv.QR_scanner import qr_scanner
 from RobotGui.core.cv.detections import QR_Detector
-from RobotGui.core.cv.detections import orientation
-from RobotGui.core.cv.color_detection_and_recognition import DetectColor
+from RobotGui.core.cv.detections import color_detector
+from RobotGui.core.cv.color_detection_and_recognition import ColorDetection
 import numpy as np
 
 class Camera:
@@ -47,7 +47,7 @@ class Camera:
             img = self._frame
             if img is not None:
                 QR_Detector(img)
-                orientation(img)
+                color_detector(img)
             sleep(0.2)          
     def color_loop(self):
         while True:

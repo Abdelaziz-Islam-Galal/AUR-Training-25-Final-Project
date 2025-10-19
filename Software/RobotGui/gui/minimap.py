@@ -1,13 +1,13 @@
 ##
 ## This is a placeholder file
 ##
-from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
-from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QFont,QColor,Qt,QTransform
-import cv2
+from PySide6.QtWidgets import QWidget, QLabel, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsEllipseItem
+from PySide6.QtGui import QResizeEvent, QFont, QColor, Qt, QTransform
+from PySide6.QtCore import QTimer
 
-from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
-from RobotGui.core.communication.publish.movement import Movement_Publish
+
+
 class Minimap(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -41,6 +41,11 @@ class Minimap(QWidget):
         
         # self._x = 0
         # self._y = 0
+
+        self._coords_timer = QTimer()
+        # self._coords_timer.timeout.connect(Minimap.update_coordinates)
+        self._coords_timer.setInterval(17)  #around 60 FPS
+        self._coords_timer.start()
         
         self._subscriber = SubscribersMethods(self._coords_label)
 
@@ -57,7 +62,7 @@ class Minimap(QWidget):
 
 
         x_offset = (window_width - self._square_size) // 2
-        y_offset = (window_height - self._square_size) // 2
+        y_offset = 0
 
         self._scene.setSceneRect(0, 0, self._square_size, self._square_size)
         transform = QTransform()
