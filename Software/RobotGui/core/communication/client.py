@@ -8,10 +8,15 @@ import time
 from threading import Thread
 
 class Mqtt():
-    def __init__(self, coordinates_slot, address = 'localhost', port = 1883):
+    def __init__(self, address = 'localhost', port = 1883):
+        print("Entered Mqtt")
+        self.address = address
+        self.port = port
+
         self.publishing_setup() #for all publishing to all topics
 
-        self.coordinates = Coordinates(coordinates_slot, address, port)
+    def setup_coordinates(self, coordinates_slot):
+        self.coordinates = Coordinates(coordinates_slot, self.address, self.port)
         #self.arm_position = Arm_Position(arm_slot, address, port) -> add arm_slot as input if this is uncommented
 
 
@@ -23,16 +28,17 @@ class Mqtt():
         self.pub.connect("localhost", 1883)
         self.pub.loop_start()
 
-    def publish_msg(self, mqtt_client, topic, *args):
+    # I am calling self with the word mqtt_client to remember this important fact
+    def publish_msg(mqtt_client, topic, *args):
         if len(args) == 1:
             message = str(args[0])
         else:
             message = ",".join(str(arg) for arg in args)
         
-        self._pub_thread = Thread(target=self._publishing, args=[mqtt_client, topic, message], daemon=True)
-        self._pub_thread.start()
+        mqtt_client._pub_thread = Thread(target=mqtt_client._publishing, args=[topic, message], daemon=True)
+        mqtt_client._pub_thread.start()
         
-    def _publishing(self, mqtt_client, topic, message):    
+    def _publishing(mqtt_client, topic, message):    
         msg = mqtt_client.pub.publish(topic, message)
         if mqtt_client.unacked_publish is not None:
             mqtt_client.unacked_publish.add(msg.mid)

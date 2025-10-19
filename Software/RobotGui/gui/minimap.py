@@ -7,7 +7,7 @@ import cv2
 
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
-
+from RobotGui.core.communication.publish.movement import Movement_Publish
 class Minimap(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -42,8 +42,7 @@ class Minimap(QWidget):
         # self._x = 0
         # self._y = 0
         
-        self._subscribers = SubscribersMethods(self._coords_label)
-        self._mqtt = Mqtt(self._subscribers.update_coordinates)
+        self._subscriber = SubscribersMethods(self._coords_label)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
