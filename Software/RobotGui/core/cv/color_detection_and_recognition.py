@@ -31,21 +31,24 @@ COLORS_BGR = {
 
 
 #----> getting the lower and upper values for a color in HSV to form masks
-def HSV_LowerUpper(HSVcolor):
-    c = np.uint8([[HSVcolor]])  #type:ignore
+def HSV_LowerUpper(BGRcolor):
+    c = np.uint8([[BGRcolor]])  #type:ignore
     hsvC = cv2.cvtColor(c , cv2.COLOR_BGR2HSV) #type:ignore
     
     hue = hsvC[0][0][0]  
 
+    SatThresh = 50 #for testing  
+    ValThresh = 30   #for testing 
+
     # Handle red hue wrap-around
     if hue >= 165:  
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
+        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([180, 255, 255], dtype=np.uint8)
     elif hue <= 15:  
-        lowerLimit = np.array([0, 100, 100], dtype=np.uint8)
+        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
     else:
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
+        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
     return lowerLimit, upperLimit
