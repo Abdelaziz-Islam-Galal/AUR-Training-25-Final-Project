@@ -1,16 +1,14 @@
 from PySide6.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy
-from PySide6.QtGui import QResizeEvent
-from PySide6.QtCore import QTimer
+from PySide6.QtGui import QResizeEvent, QKeyEvent, Qt
+
 from RobotGui.gui.camera_display import CameraDisplay
 from RobotGui.gui.minimap import Minimap
 from RobotGui.gui.settings import Settings
+from RobotGui.gui.QR_display import QRDisplay
 
-from PySide6.QtGui import QKeyEvent, Qt
 from RobotGui.core.communication.client import Mqtt
-from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 from RobotGui.core.communication.publish.movement import Movement_Publish
 
-# _mqtt = None
 
 class Window(QMainWindow):
     def __init__(self):
@@ -22,15 +20,8 @@ class Window(QMainWindow):
         self.setWindowTitle('Robot GUI')
 
         self.setCentralWidget(CentralWidget())
-        self.centralWidget().setMinimumSize(550, 300)
+        self.centralWidget().setMinimumSize(770, 420)
         self._aspect_ratio = 11/6
-        self._coords_timer=QTimer()
-        self._camera_timer = QTimer()
-        # self._camera_timer.timeout.connect(Minimap.update_coordinates)
-        self._camera_timer.setInterval(17)  #around 60 FPS
-        self._camera_timer.start()
-
-        #self._subscribers = SubscribersMethods(self._coords_label)
         
         self._movement_publisher = Movement_Publish(_mqtt)
 
@@ -88,6 +79,10 @@ class WidgetGrid(QWidget):
         self._minimap_widget = Minimap()
         self._minimap_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._v_layout.addWidget(self._minimap_widget, stretch=1)
+
+        self._qr_label = QRDisplay()
+        self._qr_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self._v_layout.addWidget(self._qr_label, stretch=0)
 
         self._settings_widget = Settings()
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)

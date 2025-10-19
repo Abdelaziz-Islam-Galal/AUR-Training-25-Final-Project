@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QImage, QPixmap, QResizeEvent
-from PySide6.QtCore import QTimer
-from RobotGui.placeholders.cv import Camera
+from PySide6.QtCore import QTimer, Slot
+from RobotGui.placeholders.cv_Test import Camera
+
 
 class CameraDisplay(QWidget):
     def __init__(self, parent: QWidget | None = None):
@@ -41,6 +42,7 @@ class CameraDisplay(QWidget):
 
         self._frame_view.setGeometry(x_offset, y_offset, new_width, new_height)
 
+    @Slot()
     def update_view(self):
         frame = self._camera_device.frame
         if frame is not None:
