@@ -31,9 +31,16 @@ class Minimap(QWidget):
         
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
-        self._x = 0
-        self._y = 0
-        self._coords_label.setText(f'x:{self._x}, y:{self._y}')
+        
+        # self._x = 0
+        # self._y = 0
+
+        self._coords_timer = QTimer()
+        # self._coords_timer.timeout.connect(Minimap.update_coordinates)
+        self._coords_timer.setInterval(17)  #around 60 FPS
+        self._coords_timer.start()
+        
+        self._subscriber = SubscribersMethods(self._coords_label)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
@@ -48,7 +55,7 @@ class Minimap(QWidget):
 
 
         x_offset = (window_width - self._square_size) // 2
-        #y_offset = (window_height - self._square_size) // 2
+        y_offset = 0
 
         self._scene.setSceneRect(0, 0, self._square_size, self._square_size)
         transform = QTransform()
@@ -62,8 +69,8 @@ class Minimap(QWidget):
         
 
 
-        self._view.setGeometry(x_offset, 0, self._square_size, self._square_size)
-        self._coords_label.move(x_offset + 5, 0)
+        self._view.setGeometry(x_offset, y_offset, self._square_size, self._square_size)
+        self._coords_label.move(x_offset + 5, y_offset)
 
     def showEvent(self, event):
         super().showEvent(event)
