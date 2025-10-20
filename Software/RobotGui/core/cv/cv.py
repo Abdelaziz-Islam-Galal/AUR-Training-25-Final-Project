@@ -53,7 +53,7 @@ class Camera:
         while True:
             img = self._frame
             if img is not None:
-                DetectColor(img)
+                ColorDetection(img)
             sleep(0.2)   
     @property
     def frame(self):
