@@ -88,4 +88,4 @@ class WidgetGrid(QWidget):
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._settings_widget, stretch=0)
 
-        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
+       # self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
