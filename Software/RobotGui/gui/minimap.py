@@ -90,7 +90,7 @@ class Minimap(QWidget):
         self._robot.setRect(self._robot_coords[0],self._robot_coords[1],10,10)
 
     
-    def update_coordinates():
+    # def update_coordinates():
         #client subscribe function to be called let's say it's called new_coords
         '''self._robot_coords=new_coords()
         self._robot.setPos(self._robot_coords)'''
