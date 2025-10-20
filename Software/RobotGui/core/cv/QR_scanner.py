@@ -1,14 +1,16 @@
 import cv2
+import re
 
 def qr_scanner(img):
         scan = cv2.QRCodeDetector()
         coords, box, straight_qrcode = scan.detectAndDecode(img)
         if coords == "":
             return "no QR code"
-        parts = coords.split("&")
+        parts = re.findall(r"\d+\.?\d*", coords)
+
         try:
-            x = float(parts[0].split("=")[1])
-            y = float(parts[1].split("=")[1])
+            x = float(parts[0])
+            y = float(parts[1])
         except (IndexError, ValueError):
-            return "invalid QR data"
+            return coords
         return f"{x}, {y}"

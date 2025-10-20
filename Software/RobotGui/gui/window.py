@@ -1,26 +1,37 @@
 from PySide6.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy
-from PySide6.QtGui import QResizeEvent
-from PySide6.QtCore import QTimer
+from PySide6.QtGui import QResizeEvent, QKeyEvent, Qt
+
 from RobotGui.gui.camera_display import CameraDisplay
 from RobotGui.gui.minimap import Minimap
 from RobotGui.gui.settings import Settings
+from RobotGui.gui.QR_display import QRDisplay
+
+from RobotGui.core.communication.client import Mqtt
+from RobotGui.core.communication.publish.movement import Movement_Publish
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        global _mqtt
+        _mqtt = Mqtt()
+
         self.setWindowTitle('Robot GUI')
 
         self.setCentralWidget(CentralWidget())
-        self.centralWidget().setMinimumSize(550, 300)
+        self.centralWidget().setMinimumSize(770, 420)
         self._aspect_ratio = 11/6
-        self._coords_timer=QTimer()
-        self._camera_timer = QTimer()
-        self._camera_timer.timeout.connect(Minimap.update_coordinates)
-        self._camera_timer.setInterval(17)  #around 60 FPS
-        self._camera_timer.start()
+        
+        self._movement_publisher = Movement_Publish(_mqtt)
 
+        # to make the window focus on keyboard presses
+        self.setFocusPolicy(Qt.StrongFocus)
         self.show()
+
+    key = None
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        self._movement_publisher.handle_key_event(event)
+        super().keyPressEvent(event)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
@@ -68,6 +79,12 @@ class WidgetGrid(QWidget):
         self._minimap_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._v_layout.addWidget(self._minimap_widget, stretch=1)
 
+        self._qr_label = QRDisplay()
+        self._qr_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self._v_layout.addWidget(self._qr_label, stretch=0)
+
         self._settings_widget = Settings()
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._settings_widget, stretch=0)
+
+        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
