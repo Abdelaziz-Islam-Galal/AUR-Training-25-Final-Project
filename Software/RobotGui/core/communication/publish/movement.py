@@ -25,7 +25,7 @@ class Movement_Publish():
         #     self.direction -= 1
         else:
             return
-        print(f"Movement detected: magnitude={1}, direction={self.direction}")
+        # print(f"Movement detected: magnitude={1}, direction={self.direction}")
         self.publish_body_movement([1, self.direction])
 
     def publish_body_movement(self, cmd:list):
@@ -36,20 +36,20 @@ class Movement_Publish():
         self.magnitude = cmd[0]
         self.angle = cmd[1]
         if self.flag == 0:
-            Mqtt.publish_msg(self.mqtt, "/movement/body", self.magnitude, self.angle)
+            Mqtt.publish_msg(self.mqtt, "movement_body", self.magnitude, self.angle)
             print(f"Published body movement: {self.magnitude},{self.angle}")
         elif self.flag == 1:
-            Mqtt.publish_msg(self.mqtt, "/movement/body", self.x, self.y) 
+            Mqtt.publish_msg(self.mqtt, "movement_body", self.x, self.y) 
             print(f"Published body movement: {self.x},{self.y}")
 
 
     def publish_arm_movement(self, cmd:list):
         self.direction = cmd[0] # 3 states -> -1/0/1
-        Mqtt.publish_msg(self.mqtt, "/movement/arm", self.direction)
+        Mqtt.publish_msg(self.mqtt, "movement_arm", self.direction)
         print(f"Published arm movement: {self.direction}")
     
     def publish_gripper_state(self, cmd:list):
         self.open = cmd[0] # boolean -> 0/1
-        Mqtt.publish_msg(self.mqtt, "/movement/gripper", self.open)
+        Mqtt.publish_msg(self.mqtt, "movement_gripper", self.open)
         print(f"Published gripper state: {self.open}")
 
