@@ -1,9 +1,5 @@
-##
-## This is a placeholder file
-##
 from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
-from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QFont,QColor,Qt,QTransform
-import cv2
+from PySide6.QtGui import  QResizeEvent, QFont,QColor,Qt,QTransform
 
 
 class Minimap(QWidget):
@@ -33,7 +29,6 @@ class Minimap(QWidget):
         self._scene.addItem(self._robot)
 
         
-        self._robot_coords=None
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
         self._x = 0
@@ -53,7 +48,7 @@ class Minimap(QWidget):
 
 
         x_offset = (window_width - self._square_size) // 2
-        y_offset = (window_height - self._square_size) // 2
+        #y_offset = (window_height - self._square_size) // 2
 
         self._scene.setSceneRect(0, 0, self._square_size, self._square_size)
         transform = QTransform()
@@ -67,15 +62,19 @@ class Minimap(QWidget):
         
 
 
-        self._view.setGeometry(x_offset, y_offset, self._square_size, self._square_size)
-        self._coords_label.move(x_offset + 5, y_offset)
+        self._view.setGeometry(x_offset, 0, self._square_size, self._square_size)
+        self._coords_label.move(x_offset + 5, 0)
 
     def showEvent(self, event):
         super().showEvent(event)
-        self.update_minimap()
+        self.init_minimap()
 
-    def update_minimap(self):
+    def init_minimap(self):
         #self._view.setGeometry(0, 0, self.width(), self.height())
+        window_size = self.size()
+        window_width = window_size.width()
+        window_height = window_size.height()
+        self._square_size = min(window_width, window_height)
         self._scene.setSceneRect(0,0,self._square_size,self._square_size)
         transform=QTransform()
         transform.translate(0,self._square_size)
@@ -88,6 +87,8 @@ class Minimap(QWidget):
     
     def update_coordinates():
         #client subscribe function to be called let's say it's called new_coords
-        '''self._robot_coords=new_coords()
-        self._robot.setPos(self._robot_coords)'''
+        '''real_coord=new_coords()
+        self._coords_label.setText(f'x:{real_coord[0]}, y:{real_coord[1]}')
+        real_coord=real_coord*self._square_size/3
+        self._robot.setPos(real_coord)'''
             
