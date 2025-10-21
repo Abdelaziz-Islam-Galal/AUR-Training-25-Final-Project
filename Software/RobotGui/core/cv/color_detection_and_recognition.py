@@ -41,17 +41,17 @@ def HSV_LowerUpper(BGRcolor):
     ValThresh = 30   #for testing 
 
     # Handle red hue wrap-around
-    if hue >= 165:  
-        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
-        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
-    elif hue <= 15:  
-        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+    if hue>=170 or hue<=10:
+        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([hue+10,255,255],dtype=np.uint8)
+        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper2=np.array([179,255,255],dtype=np.uint8)
+        return [(lower1,upper1),(lower2,upper2)]
     else:
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return lowerLimit, upperLimit
+    return [(lowerLimit, upperLimit)]
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
@@ -145,7 +145,24 @@ class ColorDetection():
         
 
 #----->usable function for color recognition(still testing)
-def RecognizeColors(frame , colors):
+#def RecognizeColors(frame : cv2.Mat , colors):
+#    length = frame.shape[0]
+#    width = frame.shape[1]
+#
+#    hsvframe = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) 
+#
+#    cx = width // 2
+#    cy = length // 2
+#
+#    hsv = hsvframe[cx,cy]
+#
+#    for colorname in colors:
+#       lower , upper = HSV_LowerUpper(COLORS_BGR[colorname])
+#       if np.all(hsv>=lower ).all and np.all(hsv<=upper).all:
+#           return colorname
+#       
+#        
+#        
     #detected = None
 #
     #for color_name in colors:
@@ -160,7 +177,7 @@ def RecognizeColors(frame , colors):
     #            detected = color_name
 #
     #return detected
-    pass
+   # pass
         
 
     
@@ -169,28 +186,29 @@ def RecognizeColors(frame , colors):
     
 #----->testing rubbish
 
-#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 #address = "http://192.168.1.9:8080/video"
 #cap.open(address)
 
-#while True:
-#    ret , frame = cap.read()
-#    reco = RecognizeColors(frame , COLORS_BGR)
-#    print(f'      {reco}        ')
-#
-#    image = ColorDetection(frame , "green")
-#    detected = image.DetectColor()
-#    x , y = image.saturation
-#    length = frame.shape[0]
-#    width = frame.shape[1]
-#    diffx , diffy = image.sat_dist_to_center
-#    if detected:
-#        print(f'{x},{y} ,color detected ')
-#
-#    cv2.imshow('frame', frame)
-#    if cv2.waitKey(1) == ord('z'):
-#        break
-#
-#cap.release()
-#
-#cv2.destroyAllWindows()
+while True:
+    ret , frame = cap.read()
+    
+    #reco = RecognizeColors(frame , COLORS_BGR)
+    #print(f'      {reco}        ')
+
+    image = ColorDetection(frame , "green")
+    detected = image.DetectColor()
+    x , y = image.saturation
+    length = frame.shape[0]
+    width = frame.shape[1]
+    diffx , diffy = image.sat_dist_to_center
+    if detected:
+        print(f'{x},{y} ,color detected ,     {diffx},     {image.right_posisiton} ')
+
+    cv2.imshow('frame', frame)
+    if cv2.waitKey(1) == ord('z'):
+        break
+
+cap.release()
+
+cv2.destroyAllWindows()
