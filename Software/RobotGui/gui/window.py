@@ -9,9 +9,11 @@ from RobotGui.gui.QR_display import QRDisplay
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.publish.movement import Movement_Publish
 
+import RobotGui.core.control.controller
 
 class Window(QMainWindow):
     def __init__(self):
+
         super().__init__()
 
         global _mqtt

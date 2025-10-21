@@ -47,30 +47,30 @@ while True:
             
 
             vector=[magnitude, angle] 
-            robotcontroller.choose_mode(vector)#sending list to cmd receiver
-            #print(f'{magnitude},{angle}')
+            robotcontroller.command_list(vector)#sending list to cmd receiver
+            print(f'{magnitude},{angle}')
             
             #on pushing event
         if event.type == pygame.JOYBUTTONDOWN:
-            if event.button == 0:   #X button
-                xpressed = [True]
+            if event.button == 0:   #X button -> arm down
+                xpressed = ['a',-1]
                 #print("X is pressed")
-                robotcontroller.choose_mode(xpressed)
+                robotcontroller.command_list(xpressed)
 
-            elif event.button == 1: #circle button
-                cpressed = [True]
+            elif event.button == 1: #circle button -> gripper open
+                cpressed = ['g', 1]
                 #print("C is pressed")
-                robotcontroller.choose_mode(cpressed)
+                robotcontroller.command_list(cpressed)
 
-            elif event.button == 2: #square button
-                spressed = [True]
+            elif event.button == 2: #square button -> gripper close
+                spressed = ['g', 0]
                 #print("S is pressed")
-                robotcontroller.choose_mode(spressed)
+                robotcontroller.command_list(spressed)
 
-            elif event.button == 3: #triangle button
-                tpressed = [True]
+            elif event.button == 3: #triangle button -> arm up
+                tpressed = ['a',1]
                 #print("T is pressed")
-                robotcontroller.choose_mode(tpressed)
+                robotcontroller.command_list(tpressed)
 
 
             # on releasing event
@@ -78,21 +78,21 @@ while True:
             if event.button == 0:
                 xpressed = [False]
                 #print("X is released")
-                robotcontroller.choose_mode(xpressed)
+                robotcontroller.command_list(xpressed)
 
             elif event.button == 1:
                 cpressed = [False]
                 #print("C is released")
-                robotcontroller.choose_mode(cpressed)
+                robotcontroller.command_list(cpressed)
 
             elif event.button == 2:
                 spressed = [False]
                 #print("S is released")
-                robotcontroller.choose_mode(spressed)
+                robotcontroller.command_list(spressed)
 
             elif event.button == 3:
                 tpressed = [False]
                 #print("T is released")
-                robotcontroller.choose_mode(tpressed)
+                robotcontroller.command_list(tpressed)
     
     pygame.time.delay(10)
