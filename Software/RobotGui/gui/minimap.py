@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
 from PySide6.QtGui import  QResizeEvent, QFont,QColor,Qt,QTransform
 from PySide6.QtCore import QTimer
+from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 
 # class SubscribersMethods:
 #     def __init__(self, coords_label: QLabel):
@@ -101,10 +102,6 @@ class Minimap(QWidget):
         self._robot.setRect(self._robot_coords[0],self._robot_coords[1],10,10)
 
     
-    # def update_coordinates():
-        #client subscribe function to be called let's say it's called new_coords
-        '''real_coord=new_coords()
-        self._coords_label.setText(f'x:{real_coord[0]}, y:{real_coord[1]}')
-        real_coord=real_coord*self._square_size/3
-        self._robot.setPos(real_coord)'''
+    def update_coordinates(self):
+        return SubscribersMethods.coordinates
             

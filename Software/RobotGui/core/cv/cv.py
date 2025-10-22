@@ -34,11 +34,11 @@ class Camera:
     def __init__(self) -> None:
         self._empty_frame = np.zeros((500, 500, 3), dtype=np.uint8)
         self._cap = cv2.VideoCapture(0)
-        self._cap.open("http://192.168.1.4:8080/video")
+        self._cap.open(0)
         self._frame = None
         self._last_qr = "no QR code"
         self._frame_thread = Thread(target=self._frame_loop, daemon=True)
-        #self._qr_thread = Thread(target=self.qr_loop, daemon=True)
+        self._qr_thread = Thread(target=self.qr_loop, daemon=True)
         self._frame_thread.start()
         self._qr_thread.start()
         #self._detection_thread = Thread(target=self.detection_loop, daemon=True)
