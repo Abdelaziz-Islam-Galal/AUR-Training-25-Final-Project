@@ -3,6 +3,7 @@ from paho.mqtt.enums import CallbackAPIVersion
 
 from RobotGui.core.communication.subscribe.coordinates import Coordinates
 from RobotGui.core.communication.subscribe.arm_position import Arm_Position
+from RobotGui.core.communication.subscribe.gripper_state import Gripper_State
 
 import time
 from threading import Thread
@@ -17,7 +18,12 @@ class Mqtt():
 
     def setup_coordinates(self, coordinates_slot):
         self.coordinates = Coordinates(coordinates_slot, self.address, self.port)
-        #self.arm_position = Arm_Position(arm_slot, address, port) -> add arm_slot as input if this is uncommented
+        
+    def setup_arm_position(self, arm_slot):
+        self.arm_position = Arm_Position(arm_slot, self.address, self.port) #-> adds arm_slot as input if this is uncommented
+
+    def setup_gripper_state(self, gripper_slot):
+        self.coordinates = Gripper_State(gripper_slot, self.address, self.port)
 
 
     # publishing methods: 
