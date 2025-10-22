@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image
+#from PIL import Image
 
 
 #------>All possible HSV colors (to mask them) until being surprised by a new color on the competetion day
@@ -41,6 +41,12 @@ def HSV_LowerUpper(BGRcolor):
     ValThresh = 30   #for testing 
 
     # Handle red hue wrap-around
+    if hue>=170 or hue<=10:
+        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([hue+10,255,255],dtype=np.uint8)
+        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper2=np.array([179,255,255],dtype=np.uint8)
+        return [(lower1,upper1),(lower2,upper2)]
     if hue>=170 or hue<=10:
         lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
         upper1=np.array([hue+10,255,255],dtype=np.uint8)
@@ -190,25 +196,25 @@ cap = cv2.VideoCapture(0)
 #address = "http://192.168.1.9:8080/video"
 #cap.open(address)
 
-while True:
-    ret , frame = cap.read()
-    
-    #reco = RecognizeColors(frame , COLORS_BGR)
-    #print(f'      {reco}        ')
+#while True:
+#    ret , frame = cap.read()
+#    reco = RecognizeColors(frame , COLORS_BGR)
+#    print(f'      {reco}        ')
+#
 
-    image = ColorDetection(frame , "green")
-    detected = image.DetectColor()
-    x , y = image.saturation
-    length = frame.shape[0]
-    width = frame.shape[1]
-    diffx , diffy = image.sat_dist_to_center
-    if detected:
-        print(f'{x},{y} ,color detected ,     {diffx},     {image.right_posisiton} ')
-
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) == ord('z'):
-        break
-
-cap.release()
-
-cv2.destroyAllWindows()
+#    image = ColorDetection(frame , "green")
+#    detected = image.DetectColor()
+#    x , y = image.saturation
+#    length = frame.shape[0]
+#    width = frame.shape[1]
+#    diffx , diffy = image.sat_dist_to_center
+#    if detected:
+#        print(f'{x},{y} ,color detected ')
+#
+#    cv2.imshow('frame', frame)
+#    if cv2.waitKey(1) == ord('z'):
+#        break
+#
+#cap.release()
+#
+#cv2.destroyAllWindows()

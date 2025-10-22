@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QImage, QPixmap, QResizeEvent
 from PySide6.QtCore import QTimer, Slot
-from RobotGui.placeholders.cv_Test import Camera
+from RobotGui.core.cv.cv import Camera
 
 
 class CameraDisplay(QWidget):
