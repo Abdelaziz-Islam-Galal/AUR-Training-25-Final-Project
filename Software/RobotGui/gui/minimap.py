@@ -1,5 +1,15 @@
 from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
 from PySide6.QtGui import  QResizeEvent, QFont,QColor,Qt,QTransform
+from PySide6.QtCore import QTimer
+
+class SubscribersMethods:
+    def __init__(self, coords_label: QLabel):
+        """Simple stub for subscriber handling used by Minimap."""
+        self._coords_label = coords_label
+
+    def update_coords(self, x: float, y: float) -> None:
+        # Update the label; replace with real subscription logic when available.
+        self._coords_label.setText(f'x:{x}, y:{y}')
 
 
 class Minimap(QWidget):
