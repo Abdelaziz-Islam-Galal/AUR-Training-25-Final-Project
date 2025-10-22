@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-#from PIL import Image
+from PIL import Image
 
 
 #------>All possible HSV colors (to mask them) until being surprised by a new color on the competetion day
@@ -9,23 +9,23 @@ COLORS_BGR = {
     'green': [20, 230, 20],
     'blue': [230, 20, 20],
     'yellow': [0, 230, 230],
-    'cyan': [230, 230, 0],
-    'magenta': [230, 0, 230],
+    #'cyan': [230, 230, 0],
+    #'magenta': [230, 0, 230],
     'orange': [0, 165, 230],
     'purple': [128, 0, 128],
     'pink': [203, 192, 230],
     'brown': [42, 42, 165],
-    'white': [255, 255, 255],
-    'black': [0, 0, 0],
-    'gray': [128, 128, 128],
-    'lime': [0, 230, 0],
-    'maroon': [0, 0, 128],
-    'teal': [128, 128, 0],
-    'navy': [128, 0, 0],
-    'olive': [0, 128, 128],
-    'coral': [80, 127, 255],
-    'gold': [0, 215, 255],
-    'silver': [192, 192, 192]
+    #'white': [255, 255, 255],
+    #'black': [0, 0, 0],
+    #'gray': [128, 128, 128],
+    #'lime': [0, 230, 0],
+    #'maroon': [0, 0, 128],
+    #'teal': [128, 128, 0],
+    #'navy': [128, 0, 0],
+    #'olive': [0, 128, 128],
+    #'coral': [80, 127, 255],
+    #'gold': [0, 215, 255],
+    #'silver': [192, 192, 192]
 
 } 
 
@@ -38,34 +38,36 @@ def HSV_LowerUpper(BGRcolor):
     hue = hsvC[0][0][0]  
 
     SatThresh = 50 #for testing  
-    ValThresh = 30   #for testing 
+    ValThresh = 60   #for testing 
 
     # Handle red hue wrap-around
-    if hue>=170 or hue<=10:
-        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
-        upper1=np.array([hue+10,255,255],dtype=np.uint8)
-        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
-        upper2=np.array([179,255,255],dtype=np.uint8)
-        return [(lower1,upper1),(lower2,upper2)]
+    if hue >= 165:  
+        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
+        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
+    elif hue <= 15:  
+        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
+        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
     else:
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return [(lowerLimit, upperLimit)]
+    return lowerLimit, upperLimit
+
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
-    ranges = HSV_LowerUpper(COLORS_BGR[color])
-    mask=np.zeros(image.shape[:2],dtype=np.uint8)
-    for lowerlimit,upperlimit in ranges:
-        mask |= cv2.inRange(image,lowerlimit,upperlimit)
+    lowerlimit = HSV_LowerUpper(COLORS_BGR[color])[0]
+    upperlimit = HSV_LowerUpper(COLORS_BGR[color])[1]
+    mask = cv2.inRange(image,lowerlimit,upperlimit) #
 
     # decreasing noise
     _, mask = cv2.threshold(mask , 0 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     #decreasing noise in the foreground
     kernel = np.ones((9,9),np.uint8)
-    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,kernel)
+    
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3,3),np.uint8))
+    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((3,3),np.uint8))
     return mask
 
 
@@ -84,7 +86,7 @@ class ColorDetection():
     #----->usable function to detect colors(class:ColorDetection)
     def DetectColor(self) -> bool : 
         DetectionMask = self.mask.copy()
-        DetectionMask = DetectionMask[:, self.width//4 : 3*self.width//4]
+        DetectionMask = DetectionMask[self.length//4 : 3*self.length//4, self.width//4 : 3*self.width//4]
 
         #using ratio to get the threshold
         self.detected = (np.sum(DetectionMask) / (DetectionMask.size * 255)) > 0.01  
@@ -93,8 +95,6 @@ class ColorDetection():
     
     @property
     def saturation(self):
-        if not self.detected:
-            return 0,0
         x1 = 0;x2=0;y1=0;y2=0
         SaturationMask = self.mask.copy() #copying the instance mask
 
@@ -123,8 +123,6 @@ class ColorDetection():
     
     @property
     def sat_dist_to_center(self):
-        if not self.detected:
-            return None
         #calculating the center of the frame
         Cx = self.width/2
         Cy = self.length/2
@@ -140,22 +138,36 @@ class ColorDetection():
     
     @property
     def right_posisiton(self):
-        if not self.detected:
-            print("no object detected")
-            return None
+        RightPosition = False
         diffx , diffy = self.sat_dist_to_center
-        if diffx > 20 :
-            RightPosition = "move left"
-        elif diffx<-20 :
-            RightPosition = "move right"
-        else:
-            RightPosition="in position"
+        if abs(diffx) < 20 :
+            RightPosition = True
+        else :
+            RightPosition = False
         
-        print(RightPosition)
+        return RightPosition
         
 
 #----->usable function for color recognition(still testing)
-def RecognizeColors(frame , colors):
+def RecognizeColors(frame : cv2.Mat , colors):
+    length = frame.shape[0]
+    width = frame.shape[1]
+
+    hsvframe = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) 
+
+    cx = width // 2
+    cy = length // 2
+
+    hsv = hsvframe[cy,cx]
+
+    for colorname in colors:
+       lower = HSV_LowerUpper(COLORS_BGR[colorname])[0]
+       upper = HSV_LowerUpper(COLORS_BGR[colorname])[1]
+       if np.all(hsv>=lower ) and np.all(hsv<=upper):
+           return colorname
+#       
+#        
+#        
     #detected = None
 #
     #for color_name in colors:
@@ -170,7 +182,7 @@ def RecognizeColors(frame , colors):
     #            detected = color_name
 #
     #return detected
-    pass
+   # pass
         
 
     
@@ -188,17 +200,16 @@ def RecognizeColors(frame , colors):
 #    reco = RecognizeColors(frame , COLORS_BGR)
 #    print(f'      {reco}        ')
 #
-
-#    image = ColorDetection(frame , "green")
+#    image = ColorDetection(frame , "orange")
 #    detected = image.DetectColor()
 #    x , y = image.saturation
 #    length = frame.shape[0]
 #    width = frame.shape[1]
 #    diffx , diffy = image.sat_dist_to_center
 #    if detected:
-#        print(f'{x},{y} ,color detected ')
+#      print(f'{x},{y} ,color detected ' , {diffx} , image.right_posisiton)
 #
-#    cv2.imshow('frame', frame)
+#    cv2.imshow('frame', image.mask)
 #    if cv2.waitKey(1) == ord('z'):
 #        break
 #
