@@ -51,6 +51,7 @@ class Minimap(QWidget):
         self._coords_timer.setInterval(17)  #around 60 FPS
         self._coords_timer.start()
         
+        self._subscriber = SubscribersMethods(self._coords_label) # important!! don't remove ever!!!!!!
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
