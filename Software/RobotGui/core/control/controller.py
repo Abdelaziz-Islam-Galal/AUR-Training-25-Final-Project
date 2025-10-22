@@ -4,7 +4,7 @@ import math
 from RobotGui.core.cv.cv import Camera
 from RobotGui.core.control.robot_controller import RobotController
 from threading import Thread
-
+from time import sleep
 class Controller():
     def __init__(self, robot_controller_instance : RobotController):
         #initiating cmd receiver 
@@ -16,16 +16,14 @@ class Controller():
         pygame.joystick.init()
 
 
-        #initiating the joystick
-        pygame.init()
-        pygame.joystick.init()
+        
 
         joystick = pygame.joystick.Joystick(0)
         joystick.init()
 
         #initiating the values used when an event happens
         self.eventValues=[0.0,0.0,0.0,0.0,0.0,0.0]
-        self.magnitude = 0;self.angle = 0;self.xpressed = False;self.cpressed = False;self.spressed = False;self.tpressed = False
+        self.magnitude = 0; self.angle = 0; self.arm = 0; self.gripper = 0
 
         self._controller_thread = Thread(target=self.logic, daemon=True)
         self._controller_thread.start()
@@ -46,7 +44,7 @@ class Controller():
                     self.magnitude = math.sqrt((x*x)+(y*y)) #self.magnitude calculated
 
                     if x != 0:
-                        self.angle = math.atan2(y , x) #from -pi/2 ------> pi/2
+                        self.angle = math.atan2(y , x) #from -pi/2 ------> pi/2  # AI says it is from -pi to pi
                         self.angle = math.degrees(self.angle)
                         if self.angle < 0:
                             self.angle = self.angle + 360
@@ -105,3 +103,17 @@ class Controller():
                 self._robot_controller.command_list([self.magnitude, self.angle, self.arm, self.gripper])
 
             pygame.time.delay(10)
+
+    def stop(self):
+        self._running = False
+        if self._controller_thread.is_alive():
+            self._controller_thread.join(timeout=1.0)  # Wait up to 1 second for thread to finish
+            
+        # Send a final stop command (optional)
+        self._robot_controller.command_list([0, 0, 0, 0])
+        
+        # Clean up pygame
+        pygame.quit()
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()

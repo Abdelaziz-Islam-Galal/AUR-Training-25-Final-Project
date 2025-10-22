@@ -19,7 +19,7 @@ class CameraDisplay(QWidget):
 
         self._camera_timer = QTimer()
         self._camera_timer.timeout.connect(self.update_view)
-        self._camera_timer.setInterval(9)
+        self._camera_timer.setInterval(17)  #around 60 FPS
         self._camera_timer.start()
 
     def resizeEvent(self, event: QResizeEvent) -> None:
