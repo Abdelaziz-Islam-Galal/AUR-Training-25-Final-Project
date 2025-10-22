@@ -106,7 +106,6 @@ class Minimap(QWidget):
     def update_coordinates(self):
         ...
         #...x,y=self._subscriber.coordinates
-        #...self._coords_label.setText(f"x:{x},y:{y}")
         #...xmap=x*self._square_size/3
         #...ymap=y*self._square_size/3
         #...self._robot_coords=(xmap,ymap)
