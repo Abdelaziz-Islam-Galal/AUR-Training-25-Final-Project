@@ -59,53 +59,46 @@ class Controller():
                     if self.magnitude == 0 : #safety procedure
                         self.angle = 0
                     
-
-                    vector=[self.magnitude, self.angle] 
-                    self._robot_controller.command_list(vector)#sending list to cmd receiver
                     print(f'{self.magnitude},{self.angle}')
             
                 #on pushing event
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 0:   #X button -> arm down
-                        self.xpressed = ['a',-1]
+                        self.arm = -1
                         #print("X is pressed")
-                        self.robot_controller.command_list(self.xpressed)
-                    elif event.button == 1: #circle button -> gripper open
-                        self.cpressed = ['g', 1]
-                        #print("C is pressed")
-                        self.robot_controller.command_list(self.cpressed)
-
-                    elif event.button == 2: #square button -> gripper close
-                        self.spressed = ['g', 0]
-                        #print("S is pressed")
-                        self.robot_controller.command_list(self.spressed)
-
                     elif event.button == 3: #triself.angle button -> arm up
-                        self.tpressed = ['a',1]
+                        self.arm = 1
                         #print("T is pressed")
-                        self.robot_controller.command_list(self.tpressed)
+                    else:
+                        self.arm = 0
+
+                    if event.button == 1: #circle button -> gripper open
+                        self.gripper = 1
+                        #print("C is pressed")
+                    elif event.button == 2: #square button -> gripper close
+                        self.gripper = 0
+                        #print("S is pressed")
 
 
                     # on releasing event
                 if event.type == pygame.JOYBUTTONUP:
                     if event.button == 0:
-                        self.xpressed = [False]
+                        self.arm = 0
                         #print("X is released")
-                        self.robot_controller.command_list(self.xpressed)
 
                     elif event.button == 1:
-                        self.cpressed = [False]
+                        self.gripper = 0
                         #print("C is released")
-                        self.robot_controller.command_list(self.cpressed)
 
                     elif event.button == 2:
-                        self.spressed = [False]
+                        self.gripper = 0
                         #print("S is released")
-                        self.robot_controller.command_list(self.spressed)
 
                     elif event.button == 3:
-                        self.tpressed = [False]
+                        self.arm = 0
                         #print("T is released")
-                        self.robot_controller.command_list(self.tpressed)
-            
+
+
+                self._robot_controller.command_list([self.magnitude, self.angle, self.arm, self.gripper])
+
             pygame.time.delay(10)

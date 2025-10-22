@@ -16,12 +16,9 @@ class RobotController():
         elif self.mode==Mode.Full_Auto:
             self.full_auto()
     def manual_control(self,cmd):
-        if cmd[0] == 'a':
-            self._move.publish_arm_movement([cmd[1]])
-        elif cmd[0] == 'g':
-            self._move.publish_gripper_state([cmd[1]])
-        else:
-            self._move.publish_body_movement(cmd)
+        self._move.publish_body_movement(cmd[0], cmd[1])
+        self._move.publish_arm_movement(cmd[2])
+        self._move.publish_gripper_state(cmd[3])
         
         #self._move.publish_body_movement(cmd)
         #self._move.publish_arm_movement(cmd)
