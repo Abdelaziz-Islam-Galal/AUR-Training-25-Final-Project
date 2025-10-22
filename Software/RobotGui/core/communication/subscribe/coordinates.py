@@ -14,7 +14,7 @@ class Coordinates():
         if reason_code.is_failure:
             print('Failed to connect to coordinates. Retrying..')
         else:
-            self.sub_coordinates.subscribe('robot/coordinates')
+            self.sub_coordinates.subscribe('robot_coordinates')
             self.sub_coordinates.on_message = self.callback
 
     def callback(self, client, userinfo, message):
