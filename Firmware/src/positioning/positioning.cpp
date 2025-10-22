@@ -29,9 +29,6 @@ Encoder::Encoder(const gpio_num_t pin_a, const gpio_num_t pin_b) {
 }
 
 
-void Positioning::setup() {
-}
-
 Positioning::Positioning(const gpio_num_t encoder_0_pin_a, const gpio_num_t encoder_0_pin_b,
                          const gpio_num_t encoder_1_pin_a, const gpio_num_t encoder_1_pin_b
 ) :
@@ -90,8 +87,8 @@ void Positioning::update() {
     float ypr[3];
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 
-    _position.x = d * cos(static_cast<const double>(ypr[0]));
-    _position.y = d * sin(static_cast<const double>(ypr[0]));
+    _position.x += d * cos(static_cast<const double>(ypr[0]));
+    _position.y += d * sin(static_cast<const double>(ypr[0]));
     _position.yaw = ypr[0];
 
     // TODO: kalman filter
