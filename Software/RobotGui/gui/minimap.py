@@ -42,6 +42,7 @@ class Minimap(QWidget):
         
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
+        self._coords_label.setText('x:0,y:0')
         
         # self._x = 0
         # self._y = 0
