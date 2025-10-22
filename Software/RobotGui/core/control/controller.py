@@ -1,7 +1,7 @@
 
 import pygame
 import math
-
+from RobotGui.core.cv.cv import Camera
 from RobotGui.core.control.robot_controller import RobotController
 from threading import Thread
 
@@ -9,6 +9,7 @@ class Controller():
     def __init__(self, robot_controller_instance : RobotController):
         #initiating cmd receiver 
         self._robot_controller = robot_controller_instance
+        self.CamInstance = Camera
 
         #initiating the joystick
         pygame.init()
@@ -79,6 +80,8 @@ class Controller():
                         self.gripper = 0
                         #print("S is pressed")
 
+                    if event.button == 5: #R1 button -> start qr scanning
+                        self.CamInstance._qr_thread.start() #type:ignore
 
                     # on releasing event
                 if event.type == pygame.JOYBUTTONUP:

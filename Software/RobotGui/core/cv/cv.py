@@ -39,8 +39,8 @@ class Camera:
         self._last_qr = "no QR code"
         self._frame_thread = Thread(target=self._frame_loop, daemon=True)
         self._qr_thread = Thread(target=self.qr_loop, daemon=True)
-        self._frame_thread.start()
-        self._qr_thread.start()
+        #self._frame_thread.start()
+        #self._qr_thread.start()
         #self._detection_thread = Thread(target=self.detection_loop, daemon=True)
         #self._detection_thread.start()
         #self._color_thread = Thread(target=self.color_loop, daemon=True)
