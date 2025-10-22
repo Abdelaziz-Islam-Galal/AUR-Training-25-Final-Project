@@ -8,8 +8,9 @@ from RobotGui.gui.QR_display import QRDisplay
 
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.publish.movement import Movement_Publish
-
-import RobotGui.core.control.controller
+# from RobotGui.core.control.keyboard_controls import Keyboard_Command
+import RobotGui.gui.settings as settings
+# from RobotGui.core.control.controller import Controller
 
 class Window(QMainWindow):
     def __init__(self):
@@ -31,10 +32,15 @@ class Window(QMainWindow):
         self.setFocusPolicy(Qt.StrongFocus)
         self.show()
 
-    key = None
-    def keyPressEvent(self, event: QKeyEvent) -> None:
-        self._movement_publisher.handle_key_event(event)
+    def keyPressEvent(self, event: QKeyEvent):
+        if settings.keyboard_instructions is not None:
+            settings.keyboard_instructions.handle_key_press(event)
         super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event: QKeyEvent):
+        if settings.keyboard_instructions is not None:
+            settings.keyboard_instructions.handle_key_release(event)
+        super().keyReleaseEvent(event)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)

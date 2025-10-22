@@ -33,7 +33,7 @@ COLORS_BGR = {
 class Camera:
     def __init__(self) -> None:
         self._empty_frame = np.zeros((500, 500, 3), dtype=np.uint8)
-        self._cap = cv2.VideoCapture(0)
+        self._cap = cv2.VideoCapture(0) # put ip
         self._cap.open(0)
         self._frame = None
         self._last_qr = "no QR code"
@@ -53,7 +53,7 @@ class Camera:
                 
             else:
                 self._cap.release()
-                self._cap.open("http://192.168.1.4:8080/video")
+                self._cap.open(0) # http://192.168.1.4:8080/video
             
             sleep(0.015)
 

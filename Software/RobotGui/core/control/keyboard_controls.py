@@ -11,61 +11,70 @@ class Keyboard_Command:
         self.arm_state = 0   # -1 = down, 0 = default, 1 = up
         self.gripper_state = 0  # 0 = open, 1 = closed 
 
-    def handle_key_event(self, key_event: QKeyEvent):
+    def handle_key_press(self, key_event: QKeyEvent):
         key = key_event.key()
         self.pressed_keys.add(key)
-        # Diagonals
-        if {Qt.Key.Key_W, Qt.Key.Key_D}.issubset(self.pressed_keys):
-            self.magnitude = 1
-            self.angle = 45
-        elif {Qt.Key.Key_S, Qt.Key.Key_D}.issubset(self.pressed_keys):
-            self.magnitude = 1
-            self.angle = 135
-        elif {Qt.Key.Key_S, Qt.Key.Key_A}.issubset(self.pressed_keys):
-            self.magnitude = 1
-            self.angle = 225
-        elif {Qt.Key.Key_W, Qt.Key.Key_A}.issubset(self.pressed_keys):
-            self.magnitude = 1
-            self.angle = 315
+        self._update_movement()
+        self.robot_control.command_list([self.magnitude, self.angle, self.arm_state, self.gripper_state])
 
-        elif key == Qt.Key.Key_W:
-            self.magnitude = 1
-            self.angle = 0       # forward
-        elif key == Qt.Key.Key_D:
-            self.magnitude = 1
-            self.angle = 90      # right
-        elif key == Qt.Key.Key_S:
-            self.magnitude = 1
-            self.angle = 180     # backward
-        elif key == Qt.Key.Key_A:
-            self.magnitude = 1
-            self.angle = 270     # left
-        else:
-            self.magnitude = 0
+    def handle_key_release(self, key_event: QKeyEvent):
+        key = key_event.key()
+        if key in self.pressed_keys:
+            self.pressed_keys.remove(key)
+        self._update_movement()
+        self.robot_control.command_list([self.magnitude, self.angle, self.arm_state, self.gripper_state])
 
-        # Arm control
+    def _update_movement(self):
+        # Reset movement
+        self.magnitude = 0
+        self.angle = 0
+        
+        # Check for movement keys
+        has_w = Qt.Key.Key_W in self.pressed_keys
+        has_a = Qt.Key.Key_A in self.pressed_keys
+        has_s = Qt.Key.Key_S in self.pressed_keys
+        has_d = Qt.Key.Key_D in self.pressed_keys
+        
+        # Diagonal movements (priority)
+        if has_w and has_d:
+            self.magnitude = 1
+            self.angle = 45    # Forward-right
+        elif has_s and has_d:
+            self.magnitude = 1
+            self.angle = 135   # Backward-right
+        elif has_s and has_a:
+            self.magnitude = 1
+            self.angle = 225   # Backward-left
+        elif has_w and has_a:
+            self.magnitude = 1
+            self.angle = 315   # Forward-left
+        
+        # Cardinal directions (only if not already in diagonal)
+        elif has_w and self.magnitude == 0:
+            self.magnitude = 1
+            self.angle = 0     # Forward
+        elif has_d and self.magnitude == 0:
+            self.magnitude = 1
+            self.angle = 90    # Right
+        elif has_s and self.magnitude == 0:
+            self.magnitude = 1
+            self.angle = 180   # Backward
+        elif has_a and self.magnitude == 0:
+            self.magnitude = 1
+            self.angle = 270   # Left
+
+    def _update_arm_and_gripper(self, key_event: QKeyEvent):
+        key = key_event.key()
+        
+        # Arm control (only on key press)
         if key == Qt.Key.Key_Y:
             self.arm_state = 1    # up
         elif key == Qt.Key.Key_N:
             self.arm_state = -1   # down
-        else:
-            self.arm_state = 0
-
-        # Gripper control
+        
+        # Gripper control (toggle on key press)
         if key == Qt.Key.Key_Space:
-            self.gripper_state = 1 - self.gripper_state 
-
-        self.robot_control.command_list([self.magnitude, self.angle, self.arm_state, self.gripper_state])
-
-    # def handle_key_release(self, key_event: QKeyEvent):
-    #     key = key_event.key()
-    #     if key in self.pressed_keys:
-    #         self.pressed_keys.remove(key)
-
-    #     # Stop movement when no movement key is pressed
-    #     if not any(k in self.pressed_keys for k in [Qt.Key.Key_W, Qt.Key.Key_A, Qt.Key.Key_S, Qt.Key.Key_D]):
-    #         self.magnitude = 0
-    #         self.publish_movement()
+            self.gripper_state = 1 - self.gripper_state
 
     # def publish_movement(self):
     #     msg = self.mqtt._mqttc_pub.publish("robot/movement", f"{self.magnitude},{self.angle}")

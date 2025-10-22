@@ -30,7 +30,7 @@ class Movement_Publish():
     #     self.publish_body_movement([1, self.direction])
 
     def publish_body_movement(self, magnitude, angle):
-        self.flag = 0 # keyboard or coordinates?
+        self.flag = 0 # magnitude & angle or coordinates?
         self.x = 0
         self.y = 0
 
