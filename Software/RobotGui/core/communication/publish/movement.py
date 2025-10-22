@@ -12,21 +12,21 @@ class Movement_Publish():
         self.direction = 0 # tmp for testing
 
     # temp for testing
-    def handle_key_event(self, key_event):
-        key = key_event.key()
+    # def handle_key_event(self, key_event):
+    #     key = key_event.key()
         
-        if key == Qt.Key.Key_Left:
-            self.direction -= 1
-        elif key == Qt.Key.Key_Right:
-            self.direction += 1
-        # elif key == Qt.Key.Key_Up:
-        #     self.direction += 1
-        # elif key == Qt.Key.Key_Down:
-        #     self.direction -= 1
-        else:
-            return
-        # print(f"Movement detected: magnitude={1}, direction={self.direction}")
-        self.publish_body_movement([1, self.direction])
+    #     if key == Qt.Key.Key_Left:
+    #         self.direction -= 1
+    #     elif key == Qt.Key.Key_Right:
+    #         self.direction += 1
+    #     # elif key == Qt.Key.Key_Up:
+    #     #     self.direction += 1
+    #     # elif key == Qt.Key.Key_Down:
+    #     #     self.direction -= 1
+    #     else:
+    #         return
+    #     # print(f"Movement detected: magnitude={1}, direction={self.direction}")
+    #     self.publish_body_movement([1, self.direction])
 
     def publish_body_movement(self, cmd:list):
         self.flag = 0 # keyboard or coordinates?

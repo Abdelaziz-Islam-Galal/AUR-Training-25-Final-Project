@@ -10,4 +10,14 @@ class SubscribersMethods(QWidget):
     def update_coordinates(self, x, y):
         self._label.setText(f'{x},{y}')
         return (x,y)
+    
+    @Slot() # we let QT to know that even if this function is called in another thread, still manage it in the QT's main thread anyway
+    def arm_position(self, theta):
+        self._label.setText(f'{theta}')
+        return theta
+    
+    @Slot() # we let QT to know that even if this function is called in another thread, still manage it in the QT's main thread anyway
+    def gripper_state(self, state):
+        self._label.setText(f'{state}')
+        return state
         
