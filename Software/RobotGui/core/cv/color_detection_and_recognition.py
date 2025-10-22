@@ -9,23 +9,23 @@ COLORS_BGR = {
     'green': [20, 230, 20],
     'blue': [230, 20, 20],
     'yellow': [0, 230, 230],
-    #'cyan': [230, 230, 0],
-    #'magenta': [230, 0, 230],
+    'cyan': [230, 230, 0],
+    'magenta': [230, 0, 230],
     'orange': [0, 165, 230],
     'purple': [128, 0, 128],
     'pink': [203, 192, 230],
     'brown': [42, 42, 165],
-    #'white': [255, 255, 255],
-    #'black': [0, 0, 0],
-    #'gray': [128, 128, 128],
-    #'lime': [0, 230, 0],
-    #'maroon': [0, 0, 128],
-    #'teal': [128, 128, 0],
-    #'navy': [128, 0, 0],
-    #'olive': [0, 128, 128],
-    #'coral': [80, 127, 255],
-    #'gold': [0, 215, 255],
-    #'silver': [192, 192, 192]
+    'white': [255, 255, 255],
+    'black': [0, 0, 0],
+    'gray': [128, 128, 128],
+    'lime': [0, 230, 0],
+    'maroon': [0, 0, 128],
+    'teal': [128, 128, 0],
+    'navy': [128, 0, 0],
+    'olive': [0, 128, 128],
+    'coral': [80, 127, 255],
+    'gold': [0, 215, 255],
+    'silver': [192, 192, 192]
 
 } 
 
@@ -38,30 +38,29 @@ def HSV_LowerUpper(BGRcolor):
     hue = hsvC[0][0][0]  
 
     SatThresh = 50 #for testing  
-    ValThresh = 60   #for testing 
+    ValThresh = 30   #for testing 
 
     # Handle red hue wrap-around
-    if hue >= 165:  
-        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
-        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
-    elif hue <= 15:  
-        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
-
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+    if hue>=170 or hue<=10:
+        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([hue+10,255,255],dtype=np.uint8)
+        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper2=np.array([179,255,255],dtype=np.uint8)
+        return [(lower1,upper1),(lower2,upper2)]
     else:
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return lowerLimit, upperLimit
-
+    return [(lowerLimit, upperLimit)]
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
-    lowerlimit = HSV_LowerUpper(COLORS_BGR[color])[0]
-    upperlimit = HSV_LowerUpper(COLORS_BGR[color])[1]
-    mask = cv2.inRange(image,lowerlimit,upperlimit) #
+    ranges = HSV_LowerUpper(COLORS_BGR[color])
+    mask=np.zeros(image.shape[:2],dtype=np.uint8)
+    for lowerlimit,upperlimit in ranges:
+        mask |= cv2.inRange(image,lowerlimit,upperlimit)
 
-    # decreasing noise
+     # decreasing noise
     _, mask = cv2.threshold(mask , 0 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     #decreasing noise in the foreground
@@ -87,7 +86,7 @@ class ColorDetection():
     #----->usable function to detect colors(class:ColorDetection)
     def DetectColor(self) -> bool : 
         DetectionMask = self.mask.copy()
-        DetectionMask = DetectionMask[self.length//4 : 3*self.length//4, self.width//4 : 3*self.width//4]
+        DetectionMask = DetectionMask[:, self.width//4 : 3*self.width//4]
 
         #using ratio to get the threshold
         self.detected = (np.sum(DetectionMask) / (DetectionMask.size * 255)) > 0.01  
@@ -96,6 +95,8 @@ class ColorDetection():
     
     @property
     def saturation(self):
+        if not self.detected:
+            return 0,0
         x1 = 0;x2=0;y1=0;y2=0
         SaturationMask = self.mask.copy() #copying the instance mask
 
@@ -124,6 +125,8 @@ class ColorDetection():
     
     @property
     def sat_dist_to_center(self):
+        if not self.detected:
+            return None
         #calculating the center of the frame
         Cx = self.width/2
         Cy = self.length/2
@@ -139,18 +142,22 @@ class ColorDetection():
     
     @property
     def right_posisiton(self):
-        RightPosition = False
+        if not self.detected:
+            return "no object detected"
+            #return None
         diffx , diffy = self.sat_dist_to_center
-        if abs(diffx) < 20 :
-            RightPosition = True
-        else :
-            RightPosition = False
+        if diffx > 20 :
+            RightPosition = "move left"
+        elif diffx<-20 :
+            RightPosition = "move right"
+        else:
+            RightPosition="in position"
         
         return RightPosition
         
 
 #----->usable function for color recognition(still testing)
-def RecognizeColors(frame : cv2.Mat , colors):
+def RecognizeColors(frame:cv2.Mat , colors):
     length = frame.shape[0]
     width = frame.shape[1]
 
@@ -166,24 +173,6 @@ def RecognizeColors(frame : cv2.Mat , colors):
        upper = HSV_LowerUpper(COLORS_BGR[colorname])[1]
        if np.all(hsv>=lower ) and np.all(hsv<=upper):
            return colorname
-#       
-#        
-#        
-    #detected = None
-#
-    #for color_name in colors:
-    #    mask = FormMask(frame,color_name)
-    #    mask = mask[mask.shape[0]//4 : 3*mask.shape[0]//4, mask.shape[1]//4 : 3*mask.shape[1]//4]
-#
-    #    contour , _ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    #    if contour:
-    #        largest = max(contour,key = cv2.contourArea)
-    #        area = cv2.contourArea(largest)
-    #        if area > 100:
-    #            detected = color_name
-#
-    #return detected
-   # pass
         
 
     
@@ -201,16 +190,17 @@ def RecognizeColors(frame : cv2.Mat , colors):
 #    reco = RecognizeColors(frame , COLORS_BGR)
 #    print(f'      {reco}        ')
 #
-#    image = ColorDetection(frame , "orange")
+
+#    image = ColorDetection(frame , "green")
 #    detected = image.DetectColor()
 #    x , y = image.saturation
 #    length = frame.shape[0]
 #    width = frame.shape[1]
 #    diffx , diffy = image.sat_dist_to_center
 #    if detected:
-#      print(f'{x},{y} ,color detected ' , {diffx} , image.right_posisiton)
+#        print(f'{x},{y} ,color detected ')
 #
-#    cv2.imshow('frame', image.mask)
+#    cv2.imshow('frame', frame)
 #    if cv2.waitKey(1) == ord('z'):
 #        break
 #
