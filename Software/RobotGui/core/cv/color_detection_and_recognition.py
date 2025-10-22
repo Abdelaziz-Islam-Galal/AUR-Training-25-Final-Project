@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-#from PIL import Image
+from PIL import Image
 
 
 #------>All possible HSV colors (to mask them) until being surprised by a new color on the competetion day
@@ -141,8 +141,8 @@ class ColorDetection():
     @property
     def right_posisiton(self):
         if not self.detected:
-            print("no object detected")
-            return None
+            return "no object detected"
+            #return None
         diffx , diffy = self.sat_dist_to_center
         if diffx > 20 :
             RightPosition = "move left"
@@ -151,7 +151,7 @@ class ColorDetection():
         else:
             RightPosition="in position"
         
-        print(RightPosition)
+        return RightPosition
         
 
 #----->usable function for color recognition(still testing)

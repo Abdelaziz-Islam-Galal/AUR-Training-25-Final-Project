@@ -1,7 +1,7 @@
 
 import pygame
 import math
-
+from time import sleep
 from RobotGui.core.control.robot_controller import RobotController
 from threading import Thread
 
@@ -13,18 +13,18 @@ class Controller():
         #initiating the joystick
         pygame.init()
         pygame.joystick.init()
-
+        #pygame.display.set_mode((1, 1))
 
         #initiating the joystick
-        pygame.init()
-        pygame.joystick.init()
+        #pygame.init()
+        #pygame.joystick.init()
 
         joystick = pygame.joystick.Joystick(0)
         joystick.init()
 
         #initiating the values used when an event happens
         self.eventValues=[0.0,0.0,0.0,0.0,0.0,0.0]
-        self.magnitude = 0;self.angle = 0;self.xpressed = False;self.cpressed = False;self.spressed = False;self.tpressed = False
+        self.magnitude = 0;self.angle = 0;self.xpressed = False;self.cpressed = False;self.spressed = False;self.tpressed = False;self.arm=0;self.gripper=0
 
         self._controller_thread = Thread(target=self.logic, daemon=True)
         self._controller_thread.start()
@@ -100,5 +100,4 @@ class Controller():
 
 
                 self._robot_controller.command_list([self.magnitude, self.angle, self.arm, self.gripper])
-
-            pygame.time.delay(10)
+            sleep(0.03)
