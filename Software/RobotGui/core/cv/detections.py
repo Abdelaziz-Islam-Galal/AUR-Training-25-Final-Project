@@ -44,7 +44,9 @@ def QR_Detector(frame:cv2.Mat,tracker:cv2.TrackerCSRT,initialized=False):
 
 
 
-def color_detector(frame:cv2.Mat,ranges:list,tracker:cv2.TrackerCSRT,initialized:bool,zone:bool):
+def color_detector(frame:cv2.Mat,ranges:list,initialized:bool,tracker:cv2.TrackerCSRT,zone:bool):
+    if frame is None:
+        return np.zeros((500,500,3),dtype=np.uint8),initialized,tracker
     blank_mask=np.zeros(frame.shape[:2],dtype=np.uint8)
     blank_mask[:,20:frame.shape[1]-20]=255
     frame=cv2.bitwise_and(frame,frame,mask=blank_mask)
@@ -52,6 +54,8 @@ def color_detector(frame:cv2.Mat,ranges:list,tracker:cv2.TrackerCSRT,initialized
         ok,bbox=tracker.update(frame)
         if ok:
             x, y, w, h = [int(v) for v in bbox]
+            print(f"New tracker ROI: x={x}, y={y}, w={w}, h={h}")
+
             cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
             x_center=x+(w//2)
             frame_x_center=frame.shape[1]//2
@@ -73,20 +77,39 @@ def color_detector(frame:cv2.Mat,ranges:list,tracker:cv2.TrackerCSRT,initialized
 
         contours,hierarchy=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         if hierarchy is None:
-            return frame,initialized
+            return frame,initialized,tracker
         
         if contours:
             biggest=max(contours,key=cv2.contourArea)
-            if cv2.contourArea(biggest)>100:
-                x1,y1,w,h=cv2.boundingRect(biggest)
-                if ((x1+w)<frame.shape[1] and x1>0)or zone:
-                    tracker.init(frame,(x1,y1,w,h))
-                    coordinates=(x1+(w//2),y1+(h//2))
-                    initialized=True
-                    cv2.rectangle(frame,(x1,y1),(x1+w,y1+h),(0,255,0),2)
+            if cv2.contourArea(biggest)>100 :
+                x1,y1,w1,h1=cv2.boundingRect(biggest)
+                frame_h, frame_w = frame.shape[:2]
+
+                # Ensure valid bounding box inside frame
+                x1 = max(0, x1)
+                y1 = max(0, y1)
+                w1 = min(w1, frame_w - x1)  # Ensure width doesn't exceed frame right edge
+                h1 = min(h1, frame_h - y1)  # Ensure height doesn't exceed frame bottom edge
+                
+                print(f"Adjusted bbox: x1={x1}, y1={y1}, w1={w1}, h1={h1}")
+                
+                if w1 > 10 and h1 > 10:
+                    try:
+                        tracker.init(frame, (x1, y1, w1, h1))
+                        initialized = True
+                        cv2.rectangle(frame, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+                        print(f"Init tracker ROI: x={x1}, y={y1}, w={w1}, h={h1}, frame={frame_w}x{frame_h}")
+
+                    except cv2.error as e:
+                        print(f"[Tracker Error] Failed to init tracker: {e}")
+                        initialized = False
+                        cv2.imwrite("debug_frame.png", frame)
+                        with open("debug_bbox.txt", "w") as f:
+                            f.write(f"x1={x1}, y1={y1}, w1={w1}, h1={h1},frame={frame_w}x{frame_h}\n")
                 else:
-                    cv2.rectangle(frame,(x1,y1),(x1+w,y1+h),(0,0,255),2)
-    return frame,initialized
+                    cv2.rectangle(frame, (x1, y1), (x1 + w1, y1 + h1), (0, 0, 255), 2)
+
+    return frame,initialized,tracker
     
             
 

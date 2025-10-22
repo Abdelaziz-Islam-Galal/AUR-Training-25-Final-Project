@@ -55,8 +55,10 @@ def HSV_LowerUpper(BGRcolor):
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
-    lowerlimit , upperlimit = HSV_LowerUpper(COLORS_BGR[color])
-    mask = cv2.inRange(image,lowerlimit,upperlimit)
+    ranges = HSV_LowerUpper(COLORS_BGR[color])
+    mask=np.zeros(image.shape[:2],dtype=np.uint8)
+    for lowerlimit,upperlimit in ranges:
+        mask |= cv2.inRange(image,lowerlimit,upperlimit)
 
     # decreasing noise
     _, mask = cv2.threshold(mask , 0 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -82,7 +84,7 @@ class ColorDetection():
     #----->usable function to detect colors(class:ColorDetection)
     def DetectColor(self) -> bool : 
         DetectionMask = self.mask.copy()
-        DetectionMask = DetectionMask[self.length//4 : 3*self.length//4, self.width//4 : 3*self.width//4]
+        DetectionMask = DetectionMask[:, self.width//4 : 3*self.width//4]
 
         #using ratio to get the threshold
         self.detected = (np.sum(DetectionMask) / (DetectionMask.size * 255)) > 0.01  
@@ -91,6 +93,8 @@ class ColorDetection():
     
     @property
     def saturation(self):
+        if not self.detected:
+            return 0,0
         x1 = 0;x2=0;y1=0;y2=0
         SaturationMask = self.mask.copy() #copying the instance mask
 
@@ -119,6 +123,8 @@ class ColorDetection():
     
     @property
     def sat_dist_to_center(self):
+        if not self.detected:
+            return None
         #calculating the center of the frame
         Cx = self.width/2
         Cy = self.length/2
@@ -134,14 +140,18 @@ class ColorDetection():
     
     @property
     def right_posisiton(self):
-        RightPosition = False
+        if not self.detected:
+            print("no object detected")
+            return None
         diffx , diffy = self.sat_dist_to_center
-        if abs(diffx) < 20 :
-            RightPosition = True
-        else :
-            RightPosition = False
+        if diffx > 20 :
+            RightPosition = "move left"
+        elif diffx<-20 :
+            RightPosition = "move right"
+        else:
+            RightPosition="in position"
         
-        return RightPosition
+        print(RightPosition)
         
 
 #----->usable function for color recognition(still testing)
