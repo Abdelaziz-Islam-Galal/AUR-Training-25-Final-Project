@@ -60,6 +60,16 @@ class Controller():
                         self.angle = 0
                     
 
+            vector=[magnitude, angle] 
+            robotcontroller.command_list(vector)#sending list to cmd receiver
+            print(f'{magnitude},{angle}')
+            
+            #on pushing event
+        if event.type == pygame.JOYBUTTONDOWN:
+            if event.button == 0:   #X button -> arm down
+                xpressed = ['a',-1]
+                #print("X is pressed")
+                robotcontroller.command_list(xpressed)
                     vector=[self.magnitude, self.angle] 
                     self.robot_controller.command_list(vector)#sending list to cmd receiver
                     print(f'{self.magnitude},{self.angle}')
@@ -71,16 +81,28 @@ class Controller():
                         #print("X is pressed")
                         self.robot_controller.command_list(self.xpressed)
 
+            elif event.button == 1: #circle button -> gripper open
+                cpressed = ['g', 1]
+                #print("C is pressed")
+                robotcontroller.command_list(cpressed)
                     elif event.button == 1: #circle button -> gripper open
                         self.cpressed = ['g', 1]
                         #print("C is pressed")
                         self.robot_controller.command_list(self.cpressed)
 
+            elif event.button == 2: #square button -> gripper close
+                spressed = ['g', 0]
+                #print("S is pressed")
+                robotcontroller.command_list(spressed)
                     elif event.button == 2: #square button -> gripper close
                         self.spressed = ['g', 0]
                         #print("S is pressed")
                         self.robot_controller.command_list(self.spressed)
 
+            elif event.button == 3: #triangle button -> arm up
+                tpressed = ['a',1]
+                #print("T is pressed")
+                robotcontroller.command_list(tpressed)
                     elif event.button == 3: #triself.angle button -> arm up
                         self.tpressed = ['a',1]
                         #print("T is pressed")

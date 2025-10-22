@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
 from PySide6.QtGui import  QResizeEvent, QFont,QColor,Qt,QTransform
-
+from PySide6.QtCore import QTimer
 
 class Minimap(QWidget):
     def __init__(self, parent: QWidget | None = None):
@@ -36,11 +36,10 @@ class Minimap(QWidget):
         # self._y = 0
 
         self._coords_timer = QTimer()
-        # self._coords_timer.timeout.connect(Minimap.update_coordinates)
+        self._coords_timer.timeout.connect(self.update_coordinates)
         self._coords_timer.setInterval(17)  #around 60 FPS
         self._coords_timer.start()
         
-        self._subscriber = SubscribersMethods(self._coords_label)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
