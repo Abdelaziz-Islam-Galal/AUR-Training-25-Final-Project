@@ -1,98 +1,104 @@
+
 import pygame
 import math
+
 from RobotGui.core.control.robot_controller import RobotController
+from threading import Thread
 
-#initiating cmd receiver 
-robotcontroller = RobotController()
+class Controller():
+    def __init__(self, robot_controller_instance : RobotController):
+        #initiating cmd receiver 
+        self._robot_controller = robot_controller_instance
 
-#initiating the joystick
-pygame.init()
-pygame.joystick.init()
+        #initiating the joystick
+        pygame.init()
+        pygame.joystick.init()
 
-joystick = pygame.joystick.Joystick(0)
-joystick.init()
 
-#initiating the values used when an event happens
-eventValues=[0.0,0.0,0.0,0.0,0.0,0.0]
-magnitude = 0;angle = 0;xpressed = False;cpressed = False;spressed = False;tpressed = False
+        #initiating the joystick
+        pygame.init()
+        pygame.joystick.init()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.JOYAXISMOTION:
-            if abs(event.value) > 0.1: #deadzone of joystick
-               eventValues[event.axis] = event.value #storing values according to their axis
-            else :
-                eventValues[event.axis] = 0.0
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+
+        #initiating the values used when an event happens
+        self.eventValues=[0.0,0.0,0.0,0.0,0.0,0.0]
+        self.magnitude = 0;self.angle = 0;self.xpressed = False;self.cpressed = False;self.spressed = False;self.tpressed = False
+
+        self._controller_thread = Thread(target=self.logic, daemon=True)
+        self._controller_thread.start()
+
+    def logic(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.JOYAXISMOTION:
+                    if abs(event.value) > 0.1: #deadzone of joystick
+                        self.eventValues[event.axis] = event.value #storing values according to their axis
+                    else :
+                        self.eventValues[event.axis] = 0.0
+                    
+                    # calculating and reforming data to be sent
+                    x = self.eventValues[0]
+                    y = self.eventValues[1]
+
+                    self.magnitude = math.sqrt((x*x)+(y*y)) #self.magnitude calculated
+
+                    if x != 0:
+                        self.angle = math.atan2(y , x) #from -pi/2 ------> pi/2
+                        self.angle = math.degrees(self.angle)
+                        if self.angle < 0:
+                            self.angle = self.angle + 360
+                        
+                        self.angle = self.angle + 90
+                        if self.angle < 0:
+                            self.angle = self.angle + 360
+
+                        self.angle = abs(self.angle) % 360 #self.angle calculated
+
+                    if self.magnitude == 0 : #safety procedure
+                        self.angle = 0
+                    
+                    print(f'{self.magnitude},{self.angle}')
             
-            # calculating and reforming data to be sent
-            x = eventValues[0]
-            y = eventValues[1]
+                #on pushing event
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 0:   #X button -> arm down
+                        self.arm = -1
+                        #print("X is pressed")
+                    elif event.button == 3: #triself.angle button -> arm up
+                        self.arm = 1
+                        #print("T is pressed")
+                    else:
+                        self.arm = 0
 
-            magnitude = math.sqrt((x*x)+(y*y)) #magnitude calculated
-
-            if x != 0:
-                angle = math.atan2(y , x) #from -pi/2 ------> pi/2
-                angle = math.degrees(angle)
-                if angle < 0:
-                    angle = angle + 360
-                
-                angle = angle + 90
-                if angle < 0:
-                    angle = angle + 360
-
-                angle = abs(angle) % 360 #angle calculated
-
-            if magnitude == 0 : #safety procedure
-                angle = 0
-            
-
-            vector=[magnitude, angle] 
-            robotcontroller.choose_mode(vector)#sending list to cmd receiver
-            #print(f'{magnitude},{angle}')
-            
-            #on pushing event
-        if event.type == pygame.JOYBUTTONDOWN:
-            if event.button == 0:   #X button
-                xpressed = [True]
-                #print("X is pressed")
-                robotcontroller.choose_mode(xpressed)
-
-            elif event.button == 1: #circle button
-                cpressed = [True]
-                #print("C is pressed")
-                robotcontroller.choose_mode(cpressed)
-
-            elif event.button == 2: #square button
-                spressed = [True]
-                #print("S is pressed")
-                robotcontroller.choose_mode(spressed)
-
-            elif event.button == 3: #triangle button
-                tpressed = [True]
-                #print("T is pressed")
-                robotcontroller.choose_mode(tpressed)
+                    if event.button == 1: #circle button -> gripper open
+                        self.gripper = 1
+                        #print("C is pressed")
+                    elif event.button == 2: #square button -> gripper close
+                        self.gripper = 0
+                        #print("S is pressed")
 
 
-            # on releasing event
-        if event.type == pygame.JOYBUTTONUP:
-            if event.button == 0:
-                xpressed = [False]
-                #print("X is released")
-                robotcontroller.choose_mode(xpressed)
+                    # on releasing event
+                if event.type == pygame.JOYBUTTONUP:
+                    if event.button == 0:
+                        self.arm = 0
+                        #print("X is released")
 
-            elif event.button == 1:
-                cpressed = [False]
-                #print("C is released")
-                robotcontroller.choose_mode(cpressed)
+                    elif event.button == 1:
+                        self.gripper = 0
+                        #print("C is released")
 
-            elif event.button == 2:
-                spressed = [False]
-                #print("S is released")
-                robotcontroller.choose_mode(spressed)
+                    elif event.button == 2:
+                        self.gripper = 0
+                        #print("S is released")
 
-            elif event.button == 3:
-                tpressed = [False]
-                #print("T is released")
-                robotcontroller.choose_mode(tpressed)
-    
-    pygame.time.delay(10)
+                    elif event.button == 3:
+                        self.arm = 0
+                        #print("T is released")
+
+
+                self._robot_controller.command_list([self.magnitude, self.angle, self.arm, self.gripper])
+
+            pygame.time.delay(10)

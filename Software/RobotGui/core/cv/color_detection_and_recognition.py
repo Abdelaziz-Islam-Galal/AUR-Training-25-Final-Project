@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image
+#from PIL import Image
 
 
 #------>All possible HSV colors (to mask them) until being surprised by a new color on the competetion day
@@ -41,17 +41,17 @@ def HSV_LowerUpper(BGRcolor):
     ValThresh = 30   #for testing 
 
     # Handle red hue wrap-around
-    if hue >= 165:  
-        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
-        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
-    elif hue <= 15:  
-        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+    if hue>=170 or hue<=10:
+        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([hue+10,255,255],dtype=np.uint8)
+        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper2=np.array([179,255,255],dtype=np.uint8)
+        return [(lower1,upper1),(lower2,upper2)]
     else:
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return lowerLimit, upperLimit
+    return [(lowerLimit, upperLimit)]
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
@@ -178,6 +178,7 @@ def RecognizeColors(frame , colors):
 #    reco = RecognizeColors(frame , COLORS_BGR)
 #    print(f'      {reco}        ')
 #
+
 #    image = ColorDetection(frame , "green")
 #    detected = image.DetectColor()
 #    x , y = image.saturation
