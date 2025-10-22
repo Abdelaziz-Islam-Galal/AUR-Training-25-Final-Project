@@ -8,10 +8,13 @@ from RobotGui.gui.QR_display import QRDisplay
 
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.publish.movement import Movement_Publish
-
+# from RobotGui.core.control.keyboard_controls import Keyboard_Command
+import RobotGui.gui.settings as settings
+# from RobotGui.core.control.controller import Controller
 
 class Window(QMainWindow):
     def __init__(self):
+
         super().__init__()
 
         global _mqtt
@@ -29,10 +32,15 @@ class Window(QMainWindow):
         self.setFocusPolicy(Qt.StrongFocus)
         self.show()
 
-    key = None
-    def keyPressEvent(self, event: QKeyEvent) -> None:
-        self._movement_publisher.handle_key_event(event)
+    def keyPressEvent(self, event: QKeyEvent):
+        if settings.keyboard_instructions is not None:
+            settings.keyboard_instructions.handle_key_press(event)
         super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event: QKeyEvent):
+        if settings.keyboard_instructions is not None:
+            settings.keyboard_instructions.handle_key_release(event)
+        super().keyReleaseEvent(event)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
@@ -84,8 +92,8 @@ class WidgetGrid(QWidget):
         self._qr_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._qr_label, stretch=0)
 
-        self._settings_widget = Settings()
+        self._settings_widget = Settings(_mqtt)
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._settings_widget, stretch=0)
 
-        #self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
+        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
