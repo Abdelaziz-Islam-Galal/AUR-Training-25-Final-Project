@@ -23,7 +23,7 @@ class Controller():
 
         #initiating the values used when an event happens
         self.eventValues=[0.0,0.0,0.0,0.0,0.0,0.0]
-        self.arm=0;self.gripper=0;self.magnitude = 0;self.angle = 0;self.xpressed = False;self.cpressed = False;self.spressed = False;self.tpressed = False
+        self.magnitude = 0; self.angle = 0; self.arm = 0; self.gripper = 0
 
         self._controller_thread = Thread(target=self.logic, daemon=True)
         self._controller_thread.start()
