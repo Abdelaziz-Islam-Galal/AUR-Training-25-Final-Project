@@ -12,7 +12,8 @@ class Movement_Publish():
         self.direction = 0 # tmp for testing
 
     # temp for testing
-    # def handle_key_event(self, key_event):
+    def handle_key_event(self, key_event):
+        ...
     #     key = key_event.key()
         
     #     if key == Qt.Key.Key_Left:
@@ -42,14 +43,12 @@ class Movement_Publish():
             Mqtt.publish_msg(self.mqtt, "movement_body", self.x, self.y) 
             print(f"Published body movement: {self.x},{self.y}")
 
-
     def publish_arm_movement(self, cmd:list):
         self.direction = cmd[0] # 3 states -> -1/0/1
         Mqtt.publish_msg(self.mqtt, "movement_arm", self.direction)
         print(f"Published arm movement: {self.direction}")
-    
+
     def publish_gripper_state(self, cmd:list):
         self.open = cmd[0] # boolean -> 0/1
         Mqtt.publish_msg(self.mqtt, "movement_gripper", self.open)
         print(f"Published gripper state: {self.open}")
-

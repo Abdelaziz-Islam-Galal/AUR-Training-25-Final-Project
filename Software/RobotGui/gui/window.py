@@ -84,7 +84,7 @@ class WidgetGrid(QWidget):
         self._qr_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._qr_label, stretch=0)
 
-        self._settings_widget = Settings()
+        self._settings_widget = Settings(_mqtt)
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._settings_widget, stretch=0)
 

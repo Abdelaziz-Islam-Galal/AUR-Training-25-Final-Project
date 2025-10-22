@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image
+#from PIL import Image
 
 
 #------>All possible HSV colors (to mask them) until being surprised by a new color on the competetion day

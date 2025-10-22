@@ -2,16 +2,18 @@ from PySide6.QtWidgets import QWidget, QComboBox
 from PySide6.QtCore import Slot
 from RobotGui.core.control.modes import Mode
 from RobotGui.core.control.robot_controller import RobotController
+from RobotGui.core.control.controller import Controller
 
 
 class Settings(QComboBox):
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self, mqtt_client, parent: QWidget | None = None):
         super().__init__(parent)
 
         self.setPlaceholderText('Choose Mode')
         self.addItems(['Manual', 'Semi-Auto', 'Full-Auto'])
         self.currentIndexChanged.connect(self._on_mode_change)
-        self._robot_controller = RobotController()
+        self._robot_controller = RobotController(mqtt_client)
+        self._controller_logic = Controller(self._robot_controller)
 
 
     @Slot()
