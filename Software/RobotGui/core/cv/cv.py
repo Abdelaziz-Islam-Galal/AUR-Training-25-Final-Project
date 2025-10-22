@@ -7,6 +7,7 @@ from RobotGui.core.cv.detections import color_detector
 from RobotGui.core.cv.color_detection_and_recognition import ColorDetection,COLORS_BGR
 import numpy as np
 
+cv2.setLogLevel(0)
 
 
 class Camera:
@@ -17,9 +18,8 @@ class Camera:
         self._frame = None
         self._last_qr = "no QR code"
         #self._frame_thread = Thread(target=self._frame_loop, daemon=True)
-        #self._qr_thread = Thread(target=self.qr_loop, daemon=True)
+        self._qr_thread = None
         #self._frame_thread.start()
-        #self._qr_thread.start()
         #self._detection_thread = Thread(target=self.detection_loop, daemon=True)
         #self._detection_thread.start()
         #self._color_thread = Thread(target=self.color_loop, daemon=True)
@@ -38,12 +38,17 @@ class Camera:
             
 
     def qr_loop(self):
-        while True:
-            img = self._frame
-            if img is not None:
-                result = qr_scanner(img)
-                self._last_qr = result
-            sleep(0.2)            
+            while True:
+                img = self._frame
+                if img is not None:
+                    result = qr_scanner(img)
+                    if result is not None and result != 'no QR code':
+                        self._last_qr = result
+                        print(self.last_qr)
+                        break
+                sleep(0.1)
+            print("QR scanning thread stopped.")
+
     #def detection_loop(self):
     #    while True:
     #        img = self._frame
@@ -57,18 +62,28 @@ class Camera:
     #        if img is not None:
     #            ColorDetection(img)
     #        sleep(0.2)   
+
+    def start_qr_thread(self):
+        if self._qr_thread is None or not self._qr_thread.is_alive():
+            self._qr_thread = Thread(target=self.qr_loop, daemon=True)
+            self._qr_thread.start()
+            print("QR scanning started.")
+        else:
+            print("QR thread already running.")
+
     @property
     def frame(self):
         self._frame_loop()
         #ranges=HSV_LowerUpper(COLORS_BGR['green'])
         #frame,self.initialized,self.tracker=color_detector(self._frame,ranges,self.initialized,self.tracker,False) 
         #return frame if frame is not None else self._empty_frame
+        
         detector=ColorDetection(self._frame,'green')
         detected = detector.DetectColor()
         if detected:
             detector.right_posisiton
         else:
-            print('no object detected')
+            ...#print('no object detected')
         return self._frame if self._frame is not None else self._empty_frame
 
 
