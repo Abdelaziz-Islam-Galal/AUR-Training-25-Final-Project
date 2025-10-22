@@ -6,6 +6,7 @@ def qr_scanner(img):
         coords, box, straight_qrcode = scan.detectAndDecode(img)
         if coords == "":
             return "no QR code"
+        print(coords)  
         parts = re.findall(r"\d+\.?\d*", coords)
 
         try:
