@@ -60,12 +60,14 @@ def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
     for lowerlimit,upperlimit in ranges:
         mask |= cv2.inRange(image,lowerlimit,upperlimit)
 
-    # decreasing noise
+     # decreasing noise
     _, mask = cv2.threshold(mask , 0 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     #decreasing noise in the foreground
     kernel = np.ones((9,9),np.uint8)
-    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,kernel)
+    
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3,3),np.uint8))
+    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((3,3),np.uint8))
     return mask
 
 
@@ -155,22 +157,22 @@ class ColorDetection():
         
 
 #----->usable function for color recognition(still testing)
-def RecognizeColors(frame , colors):
-    #detected = None
-#
-    #for color_name in colors:
-    #    mask = FormMask(frame,color_name)
-    #    mask = mask[mask.shape[0]//4 : 3*mask.shape[0]//4, mask.shape[1]//4 : 3*mask.shape[1]//4]
-#
-    #    contour , _ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    #    if contour:
-    #        largest = max(contour,key = cv2.contourArea)
-    #        area = cv2.contourArea(largest)
-    #        if area > 100:
-    #            detected = color_name
-#
-    #return detected
-    pass
+def RecognizeColors(frame:cv2.Mat , colors):
+    length = frame.shape[0]
+    width = frame.shape[1]
+
+    hsvframe = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) 
+
+    cx = width // 2
+    cy = length // 2
+
+    hsv = hsvframe[cy,cx]
+
+    for colorname in colors:
+       lower = HSV_LowerUpper(COLORS_BGR[colorname])[0]
+       upper = HSV_LowerUpper(COLORS_BGR[colorname])[1]
+       if np.all(hsv>=lower ) and np.all(hsv<=upper):
+           return colorname
         
 
     
