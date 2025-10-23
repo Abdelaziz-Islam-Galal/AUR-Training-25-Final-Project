@@ -8,6 +8,7 @@ from RobotGui.gui.QR_display import QRDisplay
 
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.publish.movement import Movement_Publish
+from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 # from RobotGui.core.control.keyboard_controls import Keyboard_Command
 import RobotGui.gui.settings as settings
 # from RobotGui.core.control.controller import Controller
@@ -20,13 +21,15 @@ class Window(QMainWindow):
         global _mqtt
         _mqtt = Mqtt()
 
+        global subscriber
+        subscriber = SubscribersMethods()
+        self._movement_publisher = Movement_Publish(_mqtt)
+
         self.setWindowTitle('Robot GUI')
 
         self.setCentralWidget(CentralWidget())
         self.centralWidget().setMinimumSize(770, 420)
         self._aspect_ratio = 11/6
-        
-        self._movement_publisher = Movement_Publish(_mqtt)
 
         # to make the window focus on keyboard presses
         self.setFocusPolicy(Qt.StrongFocus)
@@ -84,7 +87,7 @@ class WidgetGrid(QWidget):
 
         self._v_layout = QVBoxLayout(self)
 
-        self._minimap_widget = Minimap()
+        self._minimap_widget = Minimap(subcriber_data=subscriber)
         self._minimap_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._v_layout.addWidget(self._minimap_widget, stretch=1)
 
@@ -96,4 +99,4 @@ class WidgetGrid(QWidget):
         self._settings_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self._settings_widget, stretch=0)
 
-        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
+        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget.subscriber_data.update_coordinates)

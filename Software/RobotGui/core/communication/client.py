@@ -16,6 +16,7 @@ class Mqtt():
 
         self.publishing_setup() #for all publishing to all topics
 
+    # setup all topics that will be subscribed to
     def setup_coordinates(self, coordinates_slot):
         self.coordinates = Coordinates(coordinates_slot, self.address, self.port)
         
