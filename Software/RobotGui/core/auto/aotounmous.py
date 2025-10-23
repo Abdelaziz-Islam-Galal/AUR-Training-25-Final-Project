@@ -11,12 +11,9 @@ def qr_auto():
     x,y,theta = coords.coordinates()
     frame = Camera() 
     while y > 2:
-        img = frame.frame()
-        start = time()
-        duration = 10
-        while time() - start < duration:
-                result = qr_scanner(img)
-                return result
+            frame.start_qr_thread()
+            result = frame.last_qr
+            return result
 
     
 
