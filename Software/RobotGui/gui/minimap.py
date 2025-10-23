@@ -18,7 +18,7 @@ class Minimap(QWidget):
         super().__init__(parent)
 
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(10)
 
         self._aspect_ratio = 1
         self._square_size=None
@@ -42,7 +42,7 @@ class Minimap(QWidget):
         
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
-        self._coords_label.setText('x:0,y:0')
+        self._coords_label.setText('x:0.00, y:0.00, theta:0.00')
         
         # self._x = 0
         # self._y = 0
@@ -77,9 +77,6 @@ class Minimap(QWidget):
 
         # update background and robot
         self._background.setRect(0, 0, self._square_size, self._square_size)
-
-        
-
 
         self._view.setGeometry(x_offset, y_offset, self._square_size, self._square_size)
         self._coords_label.move(x_offset + 5, y_offset)
