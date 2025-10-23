@@ -18,6 +18,6 @@ class Gripper_State():
 
     def callback(self, client, userinfo, message):
         state_str: str = message.payload.decode()
-        slot(int(state_str)) # type: ignore
+        self.slot(int(state_str)) # type: ignore
 
 

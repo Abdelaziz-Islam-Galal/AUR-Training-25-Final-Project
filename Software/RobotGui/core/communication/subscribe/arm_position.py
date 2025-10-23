@@ -18,6 +18,6 @@ class Arm_Position():
 
     def callback(self, client, userinfo, message):
         theita_str: str = message.payload.decode()
-        slot(float(theita_str)) # type: ignore
+        self.slot(float(theita_str)) # type: ignore
 
 

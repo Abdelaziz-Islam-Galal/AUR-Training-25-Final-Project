@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import QWidget, QLabel,QGraphicsView,QGraphicsScene,QGraphicsRectItem,QGraphicsEllipseItem
 from PySide6.QtGui import  QResizeEvent, QFont,QColor,Qt,QTransform
 from PySide6.QtCore import QTimer
-from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 
 # class SubscribersMethods:
 #     def __init__(self, coords_label: QLabel):
@@ -14,8 +13,10 @@ from RobotGui.core.communication.subscribe.Subscribers_methods import Subscriber
 
 
 class Minimap(QWidget):
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self,subcriber_data , parent: QWidget | None = None):
         super().__init__(parent)
+
+        self.subscriber_data = subcriber_data
 
         font = QFont()
         font.setPointSize(10)
@@ -42,7 +43,7 @@ class Minimap(QWidget):
         
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
-        self._coords_label.setText('x:0.00, y:0.00, theta:0.00')
+        self._coords_label.setText('x:0.00, y:0.00, theta:0')
         
         # self._x = 0
         # self._y = 0
@@ -52,12 +53,9 @@ class Minimap(QWidget):
         self._coords_timer.setInterval(17)  #around 60 FPS
         self._coords_timer.start()
         
-        self._subscriber = SubscribersMethods(self._coords_label) # important!! don't remove ever!!!!!!
-
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
         
-
         window_size = self.size()
 
         window_width = window_size.width()
@@ -102,13 +100,10 @@ class Minimap(QWidget):
         #self._coords_label.setText('x:0,y:0')
     
     def update_coordinates(self):
-        if not self._square_size or self._square_size <= 0:
-            return
-        x, y = self._subscriber.coordinates
-        if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
-            return
-        xmap=x*self._square_size/3.2
-        ymap=y*self._square_size/3.2
+        x, y, theta = self.subscriber_data.coordinates
+        self._coords_label.setText(f"x:{x:.2f},y:{y:.2f},θ:{theta:.0f}")
+        xmap=x * self._square_size / 3.2
+        ymap=y * self._square_size / 3.2
         self._robot_coords=(xmap,ymap)
         self._robot.setPos(xmap,ymap)
             

@@ -9,6 +9,7 @@ from RobotGui.gui.info_display import InfoDisplay
 
 from RobotGui.core.communication.client import Mqtt
 from RobotGui.core.communication.publish.movement import Movement_Publish
+from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
 
 import RobotGui.gui.settings as settings
 
@@ -19,6 +20,10 @@ class Window(QMainWindow):
 
         global _mqtt
         _mqtt = Mqtt()
+
+        global subscriber
+        subscriber = SubscribersMethods()
+        self._movement_publisher = Movement_Publish(_mqtt)
 
         self.setWindowTitle('Robot GUI')
 
@@ -92,7 +97,7 @@ class WidgetGrid(QWidget):
 
         self._v_layout = QVBoxLayout(self)
 
-        self._minimap_widget = Minimap()
+        self._minimap_widget = Minimap(subcriber_data=subscriber)
         self._minimap_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self._v_layout.addWidget(self._minimap_widget, stretch=1)
 
@@ -108,7 +113,7 @@ class WidgetGrid(QWidget):
         self.start_button.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._v_layout.addWidget(self.start_button, stretch=0)
 
-        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget._subscriber.update_coordinates)
+        self._mqtt_sub_coordinates = _mqtt.setup_coordinates(self._minimap_widget.subscriber_data.update_coordinates)
 
 
 class StatusBar(QStatusBar):
