@@ -99,13 +99,16 @@ class Minimap(QWidget):
         self._background.setRect(0, 0, self._square_size, self._square_size)
         self._robot_coords=(0,0)
         self._robot.setRect(self._robot_coords[0],self._robot_coords[1],10,10)
-        self._coords_label.setText('x:0,y:0')
+        #self._coords_label.setText('x:0,y:0')
     
     def update_coordinates(self):
-        ...
-        #...x,y=self._subscriber.coordinates
-        #...xmap=x*self._square_size/3
-        #...ymap=y*self._square_size/3
-        #...self._robot_coords=(xmap,ymap)
-        #self._robot.setPos(xmap,ymap)
+        if not self._square_size or self._square_size <= 0:
+            return
+        x, y = self._subscriber.coordinates
+        if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+            return
+        xmap=x*self._square_size/3.2
+        ymap=y*self._square_size/3.2
+        self._robot_coords=(xmap,ymap)
+        self._robot.setPos(xmap,ymap)
             
