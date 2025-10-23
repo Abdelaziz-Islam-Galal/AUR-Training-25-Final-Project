@@ -23,6 +23,6 @@ class RobotController():
         #self._move.publish_body_movement(cmd)
         #self._move.publish_arm_movement(cmd)
         #self._move.publish_gripper_movement(cmd)
-        ...
+        
     def full_auto(self):
         ...
