@@ -60,20 +60,20 @@ class Camera:
     #            QR_self.detector(img)
     #            color_self.detector(img)
     #        sleep(0.2)          
-    def start_color_thread(self):
-        self._color_thread = Thread(target=self.color_loop, daemon=True)
+    def start_color_thread(self,frame,color):
+        self._color_thread = Thread(target=self.color_loop,args=(frame,color), daemon=True)
         self._color_thread.start()
 
-    def color_loop(self):
+    def color_loop(self,frame,color):
         self.detector = None
         while self.running:
-            img = self._frame
+            img = frame
             if img is not None:
                 if self.detector is None:
-                    self.detector = ColorDetection(img, 'green')  # create once
+                    self.detector = ColorDetection(img, color)  # create once
                 else:
                     self.detector._Frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-                    self.detector.mask = FormMask(self.detector._Frame, 'green')
+                    self.detector.mask = FormMask(self.detector._Frame,color)
 
                 self.detected = self.detector.DetectColor()
                 if self.detected:

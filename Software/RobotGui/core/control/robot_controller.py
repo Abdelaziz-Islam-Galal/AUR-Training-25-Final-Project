@@ -1,6 +1,8 @@
 from .modes import Mode
 from RobotGui.core.communication.publish.movement import Movement_Publish
 from RobotGui.core.communication.client import Mqtt
+from RobotGui.core.auto.delivery import delivery
+from RobotGui.core.auto.road_to_box import road_to_box
 
 class RobotController():
     def __init__(self, mqtt_client):
@@ -24,5 +26,5 @@ class RobotController():
         #self._move.publish_arm_movement(cmd)
         #self._move.publish_gripper_movement(cmd)
         
-    def full_auto(self):
+    def full_auto(self,):
         ...

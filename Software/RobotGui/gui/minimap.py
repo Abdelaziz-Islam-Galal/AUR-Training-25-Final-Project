@@ -102,9 +102,10 @@ class Minimap(QWidget):
     def update_coordinates(self):
         if not self._square_size or self._square_size <= 0:
             return
-        x, y ,_= self._subscriber.coordinates
+        x, y ,theta= self.subscriber_data.coordinates
         if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
             return
+        self._coords_label.setText(f'x:{x:.2f},y:{y:.2f},theta{theta}')
         xmap=x*self._square_size/3.2
         ymap=y*self._square_size/3.2
         self._robot_coords=(xmap,ymap)
