@@ -43,7 +43,7 @@ class Minimap(QWidget):
         
         self._coords_label = QLabel(self)
         self._coords_label.setFont(font)
-        self._coords_label.setText('x:0.00, y:0.00, theta:0.00')
+        self._coords_label.setText('x:0.00, y:0.00, theta:0')
         
         # self._x = 0
         # self._y = 0
@@ -101,7 +101,7 @@ class Minimap(QWidget):
     
     def update_coordinates(self):
         x, y, theta = self.subscriber_data.coordinates
-        self._coords_label.setText(f"x:{x:.2f},y:{y:.2f},θ:{theta:.2f}")
+        self._coords_label.setText(f"x:{x:.2f},y:{y:.2f},θ:{theta:.0f}")
         xmap=x * self._square_size / 3.2
         ymap=y * self._square_size / 3.2
         self._robot_coords=(xmap,ymap)
