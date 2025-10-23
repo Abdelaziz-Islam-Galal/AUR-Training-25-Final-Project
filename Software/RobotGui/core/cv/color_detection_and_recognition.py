@@ -41,17 +41,17 @@ def HSV_LowerUpper(BGRcolor):
     ValThresh = 60   #for testing 
 
     # Handle red hue wrap-around
-    if hue >= 165:  
-        lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
-        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
-    elif hue <= 15:  
-        lowerLimit = np.array([0, 100 , 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+    if hue>=170 or hue<=10:
+        lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([hue+10,255,255],dtype=np.uint8)
+        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper2=np.array([179,255,255],dtype=np.uint8)
+        return [(lower1,upper1),(lower2,upper2)]
     else:
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return lowerLimit, upperLimit
+        return [(lowerLimit, upperLimit)]
 
 
 #----->mask forming function 
