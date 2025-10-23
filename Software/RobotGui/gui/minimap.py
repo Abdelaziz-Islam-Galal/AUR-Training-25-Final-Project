@@ -104,7 +104,7 @@ class Minimap(QWidget):
     def update_coordinates(self):
         if not self._square_size or self._square_size <= 0:
             return
-        x, y = self._subscriber.coordinates
+        x, y ,_= self._subscriber.coordinates
         if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
             return
         xmap=x*self._square_size/3.2
