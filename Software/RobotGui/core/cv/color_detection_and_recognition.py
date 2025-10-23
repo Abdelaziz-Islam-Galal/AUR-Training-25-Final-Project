@@ -9,23 +9,23 @@ COLORS_BGR = {
     'green': [20, 230, 20],
     'blue': [230, 20, 20],
     'yellow': [0, 230, 230],
-    'cyan': [230, 230, 0],
-    'magenta': [230, 0, 230],
+    #'cyan': [230, 230, 0],
+    #'magenta': [230, 0, 230],
     'orange': [0, 165, 230],
     'purple': [128, 0, 128],
     'pink': [203, 192, 230],
     'brown': [42, 42, 165],
-    'white': [255, 255, 255],
-    'black': [0, 0, 0],
-    'gray': [128, 128, 128],
-    'lime': [0, 230, 0],
-    'maroon': [0, 0, 128],
-    'teal': [128, 128, 0],
-    'navy': [128, 0, 0],
-    'olive': [0, 128, 128],
-    'coral': [80, 127, 255],
-    'gold': [0, 215, 255],
-    'silver': [192, 192, 192]
+    #'white': [255, 255, 255],
+    #'black': [0, 0, 0],
+    #'gray': [128, 128, 128],
+    #'lime': [0, 230, 0],
+    #'maroon': [0, 0, 128],
+    #'teal': [128, 128, 0],
+    #'navy': [128, 0, 0],
+    #'olive': [0, 128, 128],
+    #'coral': [80, 127, 255],
+    #'gold': [0, 215, 255],
+    #'silver': [192, 192, 192]
 
 } 
 
@@ -38,7 +38,7 @@ def HSV_LowerUpper(BGRcolor):
     hue = hsvC[0][0][0]  
 
     SatThresh = 50 #for testing  
-    ValThresh = 30   #for testing 
+    ValThresh = 60   #for testing 
 
     # Handle red hue wrap-around
     if hue>=170 or hue<=10:
@@ -51,7 +51,8 @@ def HSV_LowerUpper(BGRcolor):
         lowerLimit = np.array([hue - 10, SatThresh, ValThresh], dtype=np.uint8)
         upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
 
-    return [(lowerLimit, upperLimit)]
+        return [(lowerLimit, upperLimit)]
+
 
 #----->mask forming function 
 def FormMask(image :cv2.Mat, color:str):#image should be in HSV format
@@ -190,17 +191,16 @@ def RecognizeColors(frame:cv2.Mat , colors):
 #    reco = RecognizeColors(frame , COLORS_BGR)
 #    print(f'      {reco}        ')
 #
-
-#    image = ColorDetection(frame , "green")
+#    image = ColorDetection(frame , "orange")
 #    detected = image.DetectColor()
 #    x , y = image.saturation
 #    length = frame.shape[0]
 #    width = frame.shape[1]
 #    diffx , diffy = image.sat_dist_to_center
 #    if detected:
-#        print(f'{x},{y} ,color detected ')
+#      print(f'{x},{y} ,color detected ' , {diffx} , image.right_posisiton)
 #
-#    cv2.imshow('frame', frame)
+#    cv2.imshow('frame', image.mask)
 #    if cv2.waitKey(1) == ord('z'):
 #        break
 #
