@@ -22,7 +22,6 @@ class Coordinates():
         coords = payload_str.split(',')
         if len(coords) >= 2:
             try:
-                self.slot(float(coords[0]), float(coords[1]))
+                self.slot(float(coords[0]), float(coords[1]), float(coords[2]))
             except (ValueError, IndexError) as e:
                 print(f"Error parsing coordinates: {e}")
-        self.slot(float(coords[0]), float(coords[1])) # type: ignore

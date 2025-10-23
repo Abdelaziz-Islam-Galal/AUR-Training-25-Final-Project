@@ -1,9 +1,10 @@
 import cv2
 from threading import Thread
-from time import sleep
+from time import sleep, time
 from RobotGui.core.cv.QR_scanner import qr_scanner
 from RobotGui.core.cv.color_detection_and_recognition import ColorDetection,COLORS_BGR,FormMask
 import numpy as np
+from RobotGui.core.auto.End_line import line_detection
 
 cv2.setLogLevel(0)
 
@@ -41,11 +42,14 @@ class Camera:
             while True:
                 img = self._frame.copy()
                 if img is not None:
-                    result = qr_scanner(img)
-                    if result is not None and result != 'no QR code':
-                        self._last_qr = result
-                        print(self.last_qr)
-                        break
+                    start = time()
+                    duration = 10
+                    while time() - start < duration:
+                        result = qr_scanner(img)
+                        if result is not None and result != 'no QR code':
+                            self._last_qr = result
+                            print(self.last_qr)
+                            break
                 sleep(0.1)
             print("QR scanning thread stopped.")
 
@@ -87,7 +91,13 @@ class Camera:
             print("QR scanning started.")
         else:
             print("QR thread already running.")
-
+    def line_detection_loop(self):
+        while True:
+            img = self._frame.copy()
+            if img is not None:
+                result = line_detection(img)
+                self.line = result
+                sleep(0.1)
     @property
     def frame(self): 
         #ranges=HSV_LowerUpper(COLORS_BGR['green'])
@@ -100,3 +110,6 @@ class Camera:
     def last_qr(self):
         return self._last_qr    
     
+    @property
+    def line_detector(self):
+        return self.line
