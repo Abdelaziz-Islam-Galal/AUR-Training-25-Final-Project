@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QGridLayout
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PySide6.QtCore import Slot, QTimer
 from PySide6.QtGui import QFont
 from RobotGui.core.cv.cv import Camera
@@ -16,18 +16,13 @@ class InfoDisplay(QWidget):
         self._qr_label.setFont(font)
 
         self._arm_label = QLabel()
-        self._arm_label.setStyleSheet('background-color: #DC143C;')
+        self._arm_label.setStyleSheet('background-color: #3CB371;')
         self._arm_label.setFont(font)
 
-        self._gripper_label = QLabel()
-        self._gripper_label.setStyleSheet('background-color: #3CB371;')
-        self._gripper_label.setFont(font)
-
-        self._layout = QGridLayout(self)
+        self._layout = QVBoxLayout(self)
         self._layout.setContentsMargins(0,0,0,0)
-        self._layout.addWidget(self._arm_label, 0, 0)
-        self._layout.addWidget(self._gripper_label, 0, 1)
-        self._layout.addWidget(self._qr_label, 1, 0, 1, 2)
+        self._layout.addWidget(self._arm_label)
+        self._layout.addWidget(self._qr_label)
 
         # use a single Camera instance and read its last_qr property (no parentheses)
         self._camera = Camera()
