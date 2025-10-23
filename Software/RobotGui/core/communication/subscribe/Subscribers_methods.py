@@ -11,7 +11,7 @@ class SubscribersMethods(QWidget):
 
     @Slot() # we let QT to know that even if this function is called in another thread, still manage it in the QT's main thread anyway
     def update_coordinates(self, x, y):
-        self._label.setText(f'{x},{y}')
+        self._label.setText(f'x:{x}, y:{y}, θ:')
         self.xValue = x
         self.yValue = y
     
