@@ -83,6 +83,7 @@ class ColorDetection():
         self.SaturatedX = 0
         self.SaturatedY = 0
         self.mask = FormMask(self._Frame , color)#type:ignore
+        self.inzone=False
     
     #----->usable function to detect colors(class:ColorDetection)
     def DetectColor(self) -> bool : 
@@ -115,6 +116,8 @@ class ColorDetection():
 
         if ColorBox is not None:
             x1, y1, x2, y2 = ColorBox
+            if y2==self._Frame.shape[0]:
+                self.inzone=True
         else :
             x1 = 0;x2=0;y1=0;y2=0
           

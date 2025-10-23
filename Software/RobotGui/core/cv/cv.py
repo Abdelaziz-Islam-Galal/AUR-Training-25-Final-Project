@@ -21,10 +21,10 @@ class Camera:
         self._frame_thread.start()
         #self._detection_thread = Thread(target=self.detection_loop, daemon=True)
         #self._detection_thread.start()
-        self._color_thread = Thread(target=self.color_loop, daemon=True)
-        self._color_thread.start()
-        self._line_thread = Thread(target=self.line_detection_loop, daemon=True)
-        self._line_thread.start()
+        self._color_thread = None
+        self.running=True
+        self.detected=False
+        self.detector=None
         ##self.initialized=False
     def _frame_loop(self):
         while True:
@@ -57,26 +57,32 @@ class Camera:
     #    while True:
     #        img = self._frame
     #        if img is not None:
-    #            QR_Detector(img)
-    #            color_detector(img)
+    #            QR_self.detector(img)
+    #            color_self.detector(img)
     #        sleep(0.2)          
+    def start_color_thread(self):
+        self._color_thread = Thread(target=self.color_loop, daemon=True)
+        self._color_thread.start()
+
     def color_loop(self):
-        detector = None
-        while True:
+        self.detector = None
+        while self.running:
             img = self._frame
             if img is not None:
-                if detector is None:
-                    detector = ColorDetection(img, 'green')  # create once
+                if self.detector is None:
+                    self.detector = ColorDetection(img, 'green')  # create once
                 else:
-                    detector._Frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-                    detector.mask = FormMask(detector._Frame, 'green')
+                    self.detector._Frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                    self.detector.mask = FormMask(self.detector._Frame, 'green')
 
-                detected = detector.DetectColor()
-                if detected:
-                    pos=detector.right_posisiton
+                self.detected = self.detector.DetectColor()
+                if self.detected:
+                    pos=self.detector.right_posisiton
                     if pos!="no object detected":
                         print(pos)
             sleep(0.05)    
+    def stop_color_thread(self):
+        self.running=False
 
     def start_qr_thread(self):
         if self._qr_thread is None or not self._qr_thread.is_alive():
@@ -95,7 +101,7 @@ class Camera:
     @property
     def frame(self): 
         #ranges=HSV_LowerUpper(COLORS_BGR['green'])
-        #frame,self.initialized,self.tracker=color_detector(self._frame,ranges,self.initialized,self.tracker,False) 
+        #frame,self.initialized,self.tracker=color_self.detector(self._frame,ranges,self.initialized,self.tracker,False) 
         #return frame if frame is not None else self._empty_frame
         return self._frame if self._frame is not None else self._empty_frame
 
