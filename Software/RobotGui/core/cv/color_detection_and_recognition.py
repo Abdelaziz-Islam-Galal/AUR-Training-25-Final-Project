@@ -42,9 +42,15 @@ def HSV_LowerUpper(BGRcolor):
 
     # Handle red hue wrap-around
     if hue>=170 or hue<=10:
+        u1=hue+10
+        if u1 > 180:
+            u1-=179
+        l2=hue-10
+        if l2 < 0:
+            l2+=179
         lower1=np.array([0,SatThresh,ValThresh],dtype=np.uint8)
-        upper1=np.array([hue+10,255,255],dtype=np.uint8)
-        lower2=np.array([hue-10,SatThresh,ValThresh],dtype=np.uint8)
+        upper1=np.array([u1,255,255],dtype=np.uint8)
+        lower2=np.array([l2,SatThresh,ValThresh],dtype=np.uint8)
         upper2=np.array([179,255,255],dtype=np.uint8)
         return [(lower1,upper1),(lower2,upper2)]
     else:
