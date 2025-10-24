@@ -17,11 +17,12 @@ class RobotController():
     def setMode(self,new_mode:Mode):
         print(f'switching to {new_mode.name}')
         self.mode=new_mode
+        if self.mode==Mode.Full_Auto:
+            self.full_auto()
     def command_list(self,cmd:list):  #receives command from GUI window 
         if self.mode==Mode.Manual:
             self.manual_control(cmd)
-        elif self.mode==Mode.Full_Auto:
-            self.full_auto()
+        
     def manual_control(self,cmd):
         self._move.publish_body_movement(cmd[0], cmd[1])
         self._move.publish_arm_movement(cmd[2])
@@ -33,7 +34,7 @@ class RobotController():
         
     def full_auto(self,):
         from RobotGui.gui.camera_display import camera_device
-        from RobotGui.gui.window import subscriber,movement_publisher
+        from RobotGui.gui.window import movement_publisher
 
         start=time()
         while time - start < 4*60:
