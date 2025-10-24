@@ -25,6 +25,7 @@ class Camera:
         self.running=True
         self.detected=False
         self.detector=None
+        self.timeout=True
         ##self.initialized=False
     def _frame_loop(self):
         while True:
@@ -39,19 +40,28 @@ class Camera:
                 #self._cap.open("http://192.168.1.3:8080/video")
 
     def qr_loop(self):
-            while True:
-                img = self._frame.copy()
-                if img is not None:
-                    start = time()
-                    duration = 10
-                    while time() - start < duration:
-                        result = qr_scanner(img)
-                        if result is not None and result != 'no QR code':
-                            self._last_qr = result
-                            print(self.last_qr)
-                            break
-                sleep(0.1)
-            print("QR scanning thread stopped.")
+        flag=False
+        while True:
+            img = self.frame
+            if img is not None:
+                start = time()
+                duration = 10
+                while time() - start < duration:
+                    result = qr_scanner(img)
+                    if result is not None and result != 'no QR code':
+                        self._last_qr = result
+                        print(self.last_qr)
+                        flag=True
+                        break
+                break
+            else:
+                continue
+        print("QR scanning thread stopped.")
+        if flag:
+            self.timeout=False
+        else:
+            self.timeout=True
+            
 
     #def detection_loop(self):
     #    while True:
@@ -60,20 +70,20 @@ class Camera:
     #            QR_self.detector(img)
     #            color_self.detector(img)
     #        sleep(0.2)          
-    def start_color_thread(self):
-        self._color_thread = Thread(target=self.color_loop, daemon=True)
+    def start_color_thread(self,frame,color):
+        self._color_thread = Thread(target=self.color_loop,args=(frame,color), daemon=True)
         self._color_thread.start()
 
-    def color_loop(self):
+    def color_loop(self,frame,color):
         self.detector = None
         while self.running:
-            img = self._frame
+            img = frame
             if img is not None:
                 if self.detector is None:
-                    self.detector = ColorDetection(img, 'green')  # create once
+                    self.detector = ColorDetection(img, color)  # create once
                 else:
                     self.detector._Frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-                    self.detector.mask = FormMask(self.detector._Frame, 'green')
+                    self.detector.mask = FormMask(self.detector._Frame,color)
 
                 self.detected = self.detector.DetectColor()
                 if self.detected:

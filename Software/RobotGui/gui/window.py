@@ -23,7 +23,8 @@ class Window(QMainWindow):
 
         global subscriber
         subscriber = SubscribersMethods()
-        self._movement_publisher = Movement_Publish(_mqtt)
+        global movement_publisher
+        movement_publisher = Movement_Publish(_mqtt)
 
         self.setWindowTitle('Robot GUI')
 
@@ -35,7 +36,6 @@ class Window(QMainWindow):
 
         self.centralWidget()._other_widgets.start_button.clicked.connect(self._start_timer)
         
-        self._movement_publisher = Movement_Publish(_mqtt)
 
         # to make the window focus on keyboard presses
         self.setFocusPolicy(Qt.StrongFocus)

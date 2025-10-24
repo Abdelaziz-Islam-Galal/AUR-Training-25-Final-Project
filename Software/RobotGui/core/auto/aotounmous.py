@@ -3,19 +3,13 @@ from RobotGui.core.cv.QR_scanner import qr_scanner
 import numpy as np
 from time import time
 from RobotGui.core.communication.subscribe.Subscribers_methods import SubscribersMethods
-from RobotGui.core.cv.cv import Camera
 
 def qr_auto():
+    from RobotGui.gui.window import subscriber
+    from RobotGui.gui.camera_display import camera_device
 
-    coords = SubscribersMethods()
-    x,y,theta = coords.coordinates()
-    frame = Camera() 
-    while y > 2:
-            frame.start_qr_thread()
-            result = frame.last_qr
-            return result
-
-    
-
-
-
+    x,y,theta = subscriber.coordinates()
+    if y > 2:
+        camera_device.start_qr_thread()
+        result = camera_device.last_qr
+        return result

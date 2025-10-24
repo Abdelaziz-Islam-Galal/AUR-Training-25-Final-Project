@@ -3,14 +3,15 @@ from PySide6.QtGui import QImage, QPixmap, QResizeEvent
 from PySide6.QtCore import QTimer, Slot
 from RobotGui.core.cv.cv import Camera
 
-
+camera_device=None
 class CameraDisplay(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
 
         self._aspect_ratio = 4/3
         
-        self._camera_device = Camera()
+        global camera_device
+        camera_device = Camera()
 
         self._frame_view = QLabel(self)
         self._frame_view.setScaledContents(True)
@@ -44,7 +45,7 @@ class CameraDisplay(QWidget):
 
     @Slot()
     def update_view(self):
-        frame = self._camera_device.frame
+        frame = camera_device.frame
         if frame is not None:
             image = QImage(frame.data, frame.shape[1], frame.shape[0], frame.strides[0], QImage.Format.Format_BGR888)
             self._frame_view.setPixmap(QPixmap.fromImage(image))
