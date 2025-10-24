@@ -25,6 +25,7 @@ class Camera:
         self.running=True
         self.detected=False
         self.detector=None
+        self.timeout=True
         ##self.initialized=False
     def _frame_loop(self):
         while True:
@@ -39,19 +40,28 @@ class Camera:
                 #self._cap.open("http://192.168.1.3:8080/video")
 
     def qr_loop(self):
-            while True:
-                img = self._frame.copy()
-                if img is not None:
-                    start = time()
-                    duration = 10
-                    while time() - start < duration:
-                        result = qr_scanner(img)
-                        if result is not None and result != 'no QR code':
-                            self._last_qr = result
-                            print(self.last_qr)
-                            break
-                sleep(0.1)
-            print("QR scanning thread stopped.")
+        flag=False
+        while True:
+            img = self.frame
+            if img is not None:
+                start = time()
+                duration = 10
+                while time() - start < duration:
+                    result = qr_scanner(img)
+                    if result is not None and result != 'no QR code':
+                        self._last_qr = result
+                        print(self.last_qr)
+                        flag=True
+                        break
+                break
+            else:
+                continue
+        print("QR scanning thread stopped.")
+        if flag:
+            self.timeout=False
+        else:
+            self.timeout=True
+            
 
     #def detection_loop(self):
     #    while True:

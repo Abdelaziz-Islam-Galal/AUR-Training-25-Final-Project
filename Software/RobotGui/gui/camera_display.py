@@ -3,7 +3,7 @@ from PySide6.QtGui import QImage, QPixmap, QResizeEvent
 from PySide6.QtCore import QTimer, Slot
 from RobotGui.core.cv.cv import Camera
 
-
+camera_device=None
 class CameraDisplay(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
